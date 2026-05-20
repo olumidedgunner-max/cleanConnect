@@ -1,23 +1,41 @@
+"use client";
+import { useRef } from "react";
 import Navbar from "./Navbar";
 
+const BG_IMAGE = "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=1600&auto=format&fit=crop";
+const VIDEO_URL = "https://assets.mixkit.co/videos/preview/mixkit-woman-cleaning-and-polishing-furniture-4792-large.mp4";
+
 export default function HeroSection() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   return (
     <section style={{ minHeight: "100vh", position: "relative", overflow: "hidden", padding: "30px" }}>
-      {/* Background video */}
+
+      {/* Fallback background image — always visible, video layers on top */}
+      <div style={{
+        position: "absolute", top: 0, left: 0, width: "100%", height: "100%", zIndex: 0,
+        background: `url('${BG_IMAGE}') center/cover no-repeat`,
+      }} />
+
+      {/* Background video — sits on top of image, same crop */}
       <video
+        ref={videoRef}
         autoPlay
         muted
         loop
         playsInline
-        style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 0 }}
+        poster={BG_IMAGE}
+        onError={() => { if (videoRef.current) videoRef.current.style.display = "none"; }}
+        style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 1 }}
       >
-        <source src="https://videos.pexels.com/video-files/6197096/6197096-hd_1920_1080_30fps.mp4" type="video/mp4" />
+        <source src={VIDEO_URL} type="video/mp4" />
       </video>
+
       {/* Dark overlay */}
-      <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", background: "linear-gradient(rgba(4,10,20,.78), rgba(4,10,20,.90))", zIndex: 1 }} />
+      <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", background: "linear-gradient(rgba(4,10,20,.75), rgba(4,10,20,.90))", zIndex: 2 }} />
 
       {/* Content */}
-      <div style={{ position: "relative", zIndex: 2 }}>
+      <div style={{ position: "relative", zIndex: 3 }}>
         <Navbar />
         <div style={{ maxWidth: "650px", marginTop: "100px" }}>
           <div style={{ display: "inline-block", padding: "8px 16px", background: "rgba(30,167,255,.15)", border: "1px solid rgba(30,167,255,.3)", borderRadius: "999px", color: "#57c7ff", fontSize: "13px", fontWeight: 700, marginBottom: "24px" }}>
