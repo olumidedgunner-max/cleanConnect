@@ -34,15 +34,15 @@ export const SAMPLE_JOBS: SampleJob[] = [
   },
   {
     id: "s2",
-    title: "Airbnb Turnover",
+    title: "2-Bed Flat Clean",
     city: "Manchester",
     postcode: "M1 1AE",
     status: "awaiting",
     postedAt: "2026-05-19T14:30:00Z",
     rooms: [
       { type: "Bedroom", condition: "medium", rate: 25 },
+      { type: "Bedroom", condition: "medium", rate: 25 },
       { type: "Kitchen", condition: "medium", rate: 25 },
-      { type: "Living Room", condition: "medium", rate: 25 },
       { type: "Toilet / Bathroom", condition: "medium", rate: 25 },
     ],
     subtotal: 100,

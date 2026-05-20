@@ -91,8 +91,8 @@ export default function PostJobSection() {
   const card = { background: "linear-gradient(180deg,#0d1727,#101d30)", borderRadius: "26px", padding: "36px", border: "1px solid rgba(255,255,255,.06)", marginBottom: "36px" };
 
   return (
-    <section style={{ padding: "90px 30px", maxWidth: "1100px", margin: "auto" }}>
-      <h2 style={{ fontSize: "46px", fontWeight: 900, marginBottom: "12px" }}>Post a Cleaning Job</h2>
+    <section id="post-job" style={{ padding: "90px 30px", maxWidth: "1100px", margin: "auto" }}>
+      <h2 style={{ fontSize: "46px", fontWeight: 900, marginBottom: "12px" }}>Post a Clean Job</h2>
       <p style={{ color: "#9fb0c1", fontSize: "18px", lineHeight: 1.7, marginBottom: "50px", maxWidth: "700px" }}>
         Tell us your rooms, upload photos for AI pricing, add your location, and pay securely via escrow. Each room = 1 hour.
       </p>

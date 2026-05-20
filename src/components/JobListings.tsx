@@ -4,7 +4,7 @@ import { useCleanConnect } from "@/context/CleanConnectContext";
 
 const SAMPLE_JOBS = [
   { id: "s1", title: "3-Bed House Clean", detail: "3 bedrooms · 1 kitchen · 1 living room · 2 toilets", condition: "AI: Moderate dirt", conditionColor: "#f59e0b", badge: "Awaiting Cleaner", badgeColor: "#f59e0b", price: "£140", duration: "7 hours", city: "London", postcode: "SE1 7PB", verified: true },
-  { id: "s2", title: "Airbnb Turnover", detail: "1 bedroom · 1 kitchen · 1 living room · 1 toilet", condition: "AI: Medium dirt", conditionColor: "#3b82f6", badge: "Escrow Secured", badgeColor: "#1ea7ff", price: "£100", duration: "4 hours", city: "Manchester", postcode: "M1 1AE", verified: true },
+  { id: "s2", title: "2-Bed Flat Clean", detail: "2 bedrooms · 1 kitchen · 1 toilet", condition: "AI: Medium dirt", conditionColor: "#3b82f6", badge: "Awaiting Cleaner", badgeColor: "#f59e0b", price: "£100", duration: "4 hours", city: "Manchester", postcode: "M1 1AE", verified: true },
   { id: "s3", title: "Student Flat Clean", detail: "2 bedrooms · 1 kitchen · 1 toilet", condition: "No photo — heavy rate applied", conditionColor: "#ef4444", badge: "Unverified Condition", badgeColor: "#ef4444", price: "£120", duration: "4 hours", city: "Birmingham", postcode: "B1 1BB", verified: false },
 ];
 
