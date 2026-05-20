@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useCleanConnect } from "@/context/CleanConnectContext";
 
 const SAMPLE_JOBS = [
@@ -61,9 +62,9 @@ export default function JobListings() {
               </div>
               <div style={{ fontSize: "40px", fontWeight: 900, marginBottom: "6px" }}>{job.price}</div>
               <p style={{ color: "#9fb0c1", marginBottom: "22px", fontSize: "13px" }}>Est: {job.duration}</p>
-              <button style={{ width: "100%", padding: "14px", borderRadius: "12px", border: "none", background: "linear-gradient(135deg,#1ea7ff,#0077ff)", color: "white", fontWeight: 700, fontSize: "15px", cursor: "pointer" }}>
-                Accept Job
-              </button>
+              <Link href={`/jobs/${job.id}`} style={{ display: "block", width: "100%", padding: "14px", borderRadius: "12px", border: "none", background: "linear-gradient(135deg,#1ea7ff,#0077ff)", color: "white", fontWeight: 700, fontSize: "15px", cursor: "pointer", textDecoration: "none", textAlign: "center", boxSizing: "border-box" }}>
+                View &amp; Accept Job
+              </Link>
             </div>
           );
         })}
