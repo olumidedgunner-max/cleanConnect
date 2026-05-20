@@ -34,7 +34,6 @@ export default function PostJobSection() {
   const [phone, setPhone] = useState("");
   const [postcode, setPostcode] = useState("");
   const [city, setCity] = useState("");
-  const [fullAddress, setFullAddress] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const fileInputRef = useRef<Record<string, HTMLInputElement | null>>({});
 
@@ -72,7 +71,7 @@ export default function PostJobSection() {
   const totalRooms = Object.values(counts).reduce((a, b) => a + b, 0);
 
   function handleSubmit() {
-    if (!email || !phone || !postcode || !city || !fullAddress) return;
+    if (!email || !phone || !postcode || !city) return;
     const conditions: Record<string, string> = {};
     allRows.forEach(({ key, index, entry }) => { conditions[`${key}-${index}`] = entry.condition; });
     addJob({
@@ -176,17 +175,14 @@ export default function PostJobSection() {
       {totalRooms > 0 && (
         <div style={card}>
           <h3 style={{ fontSize: "22px", fontWeight: 800, marginBottom: "8px" }}>Step 4 — Contact & Location</h3>
-          <p style={{ color: "#9fb0c1", fontSize: "14px", marginBottom: "24px" }}>Email and phone to post the job. Postcode and city so we match you with local cleaners.</p>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "20px" }}>
+          <p style={{ color: "#9fb0c1", fontSize: "14px", marginBottom: "24px" }}>
+            Just your email, phone, postcode and city for now. Your full address is only asked after a cleaner accepts — at the secure Stripe payment step.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
             <div><label style={labelStyle}>Email Address</label><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" style={inputStyle} /></div>
             <div><label style={labelStyle}>Phone Number</label><input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+44 7700 000000" style={inputStyle} /></div>
             <div><label style={labelStyle}>Postcode</label><input type="text" value={postcode} onChange={(e) => setPostcode(e.target.value)} placeholder="SW1A 1AA" style={inputStyle} /></div>
             <div><label style={labelStyle}>City</label><input type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="London" style={inputStyle} /></div>
-          </div>
-          <div>
-            <label style={labelStyle}>Full Address (released to cleaner only after payment)</label>
-            <input type="text" value={fullAddress} onChange={(e) => setFullAddress(e.target.value)} placeholder="12 Example Street, London, SW1A 1AA" style={inputStyle} />
-            <p style={{ color: "#9fb0c1", fontSize: "12px", marginTop: "8px" }}>Your full address is held securely and only shared with the cleaner once escrow is funded via Stripe.</p>
           </div>
         </div>
       )}
