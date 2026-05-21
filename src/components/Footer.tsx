@@ -5,11 +5,12 @@ export default function Footer() {
     <footer style={{ padding: "60px 30px 40px", background: "#050c17", color: "#90a3b6" }}>
       <div style={{ maxWidth: "1100px", margin: "auto" }}>
         <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: "40px", marginBottom: "50px" }}>
+
           {/* Brand */}
           <div>
-            <div style={{ fontSize: "28px", fontWeight: 800, marginBottom: "16px", color: "white" }}>
+            <Link href="/" style={{ fontSize: "28px", fontWeight: 800, marginBottom: "16px", color: "white", textDecoration: "none", display: "block" }}>
               Clean<span style={{ color: "#57c7ff" }}>Connect</span>
-            </div>
+            </Link>
             <p style={{ lineHeight: 1.7, fontSize: "14px", maxWidth: "280px" }}>
               AI-powered cleaning marketplace. Every job verified, priced fairly, and protected by escrow.
             </p>
@@ -19,7 +20,8 @@ export default function Footer() {
           <div>
             <div style={{ color: "white", fontWeight: 700, marginBottom: "16px", fontSize: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Platform</div>
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              <a href="/#post-job" style={{ color: "#90a3b6", textDecoration: "none", fontSize: "14px" }}>Post a Job</a>
+              <Link href="/post-job" style={{ color: "#90a3b6", textDecoration: "none", fontSize: "14px" }}>Post a Job</Link>
+              <Link href="/cleaners" style={{ color: "#90a3b6", textDecoration: "none", fontSize: "14px" }}>Find Cleaners</Link>
               <Link href="/register-cleaner" style={{ color: "#90a3b6", textDecoration: "none", fontSize: "14px" }}>Become a Cleaner</Link>
               <Link href="/register-business" style={{ color: "#90a3b6", textDecoration: "none", fontSize: "14px" }}>Business Account</Link>
               <Link href="/dashboard" style={{ color: "#90a3b6", textDecoration: "none", fontSize: "14px" }}>Dashboard</Link>

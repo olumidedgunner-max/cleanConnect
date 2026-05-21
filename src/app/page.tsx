@@ -3,7 +3,6 @@ import ExplainerVideo from "@/components/ExplainerVideo";
 import JobListings from "@/components/JobListings";
 import HowItWorks from "@/components/HowItWorks";
 import FeeStructure from "@/components/FeeStructure";
-import Footer from "@/components/Footer";
 import Link from "next/link";
 
 export default function Home() {
@@ -45,7 +44,6 @@ export default function Home() {
       <JobListings />
       <HowItWorks />
       <FeeStructure />
-      <Footer />
     </main>
   );
 }
