@@ -1,6 +1,7 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useCleanConnect } from "@/context/CleanConnectContext";
+import { getRemainingAnalyses, hasReachedLimit, incrementUsage, MAX_FREE } from "@/lib/analysisLimit";
 
 const ROOM_TYPES = [
   { key: "kitchen", label: "Kitchen" },
@@ -60,7 +61,14 @@ export default function PostJobSection() {
   const [postcode, setPostcode] = useState("");
   const [city, setCity] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [remaining, setRemaining] = useState(MAX_FREE);
+  const [limitReached, setLimitReached] = useState(false);
   const fileInputRef = useRef<Record<string, HTMLInputElement | null>>({});
+
+  useEffect(() => {
+    setRemaining(getRemainingAnalyses());
+    setLimitReached(hasReachedLimit());
+  }, []);
 
   function updateCount(key: string, val: number) {
     const next = Math.max(0, val);
@@ -76,6 +84,17 @@ export default function PostJobSection() {
   }
 
   async function handlePhoto(key: string, index: number, file: File) {
+    // Check daily limit before analyzing
+    if (hasReachedLimit()) {
+      setLimitReached(true);
+      setRooms((r) => {
+        const updated = [...(r[key] || [])];
+        updated[index] = { ...updated[index], hasPhoto: true, photoName: file.name, analyzing: false, analysis: null, error: "Daily free limit reached — upgrade for unlimited AI analysis" };
+        return { ...r, [key]: updated };
+      });
+      return;
+    }
+
     setRooms((r) => {
       const updated = [...(r[key] || [])];
       updated[index] = { ...updated[index], hasPhoto: true, photoName: file.name, analyzing: true, analysis: null, error: null };
@@ -97,6 +116,9 @@ export default function PostJobSection() {
         const updated = [...(r[key] || [])];
         if (data.success) {
           updated[index] = { ...updated[index], analyzing: false, analysis: data.analysis };
+          incrementUsage();
+          setRemaining(getRemainingAnalyses());
+          setLimitReached(hasReachedLimit());
         } else {
           updated[index] = { ...updated[index], analyzing: false, error: data.error || "Analysis failed" };
         }
@@ -193,8 +215,21 @@ export default function PostJobSection() {
       {totalRooms > 0 && (
         <div style={card}>
           <div style={{ marginBottom: "24px" }}>
-            <h3 style={{ fontSize: "22px", fontWeight: 800, marginBottom: "8px" }}>Step 2 — Upload photos for AI pricing</h3>
-            <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px", flexWrap: "wrap", gap: "12px" }}>
+            <h3 style={{ fontSize: "22px", fontWeight: 800 }}>Step 2 — Upload photos for AI pricing</h3>
+            {/* Daily usage counter */}
+            <div style={{
+              padding: "10px 18px", borderRadius: "12px",
+              background: limitReached ? "rgba(239,68,68,.1)" : remaining <= 2 ? "rgba(245,158,11,.1)" : "rgba(34,197,94,.1)",
+              border: `1px solid ${limitReached ? "rgba(239,68,68,.3)" : remaining <= 2 ? "rgba(245,158,11,.3)" : "rgba(34,197,94,.3)"}`,
+              fontSize: "13px", fontWeight: 700,
+              color: limitReached ? "#ef4444" : remaining <= 2 ? "#f59e0b" : "#22c55e",
+              display: "flex", alignItems: "center", gap: "8px",
+            }}>
+              🤖 {limitReached ? "Daily limit reached" : `${remaining} of ${MAX_FREE} free AI analyses left today`}
+            </div>
+          </div>
+            <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap", marginBottom: "4px" }}>
               <div style={{ background: "rgba(87,199,255,.1)", border: "1px solid rgba(87,199,255,.25)", borderRadius: "10px", padding: "8px 14px", fontSize: "13px", color: "#57c7ff", fontWeight: 600 }}>
                 🤖 Claude AI analyses each photo
               </div>
@@ -315,6 +350,24 @@ export default function PostJobSection() {
             <div><label style={labelStyle}>Phone Number</label><input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+44 7700 000000" style={inputStyle} /></div>
             <div><label style={labelStyle}>Postcode</label><input type="text" value={postcode} onChange={(e) => setPostcode(e.target.value)} placeholder="SW1A 1AA" style={inputStyle} /></div>
             <div><label style={labelStyle}>City</label><input type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="London" style={inputStyle} /></div>
+          </div>
+        </div>
+      )}
+
+      {/* Limit reached upgrade prompt */}
+      {limitReached && totalRooms > 0 && (
+        <div style={{ background: "linear-gradient(135deg,#1a1a2e,#16213e)", border: "1px solid rgba(245,158,11,.3)", borderRadius: "22px", padding: "32px", marginBottom: "24px", textAlign: "center" }}>
+          <div style={{ fontSize: "40px", marginBottom: "12px" }}>🤖</div>
+          <h3 style={{ fontSize: "22px", fontWeight: 900, marginBottom: "10px" }}>You&apos;ve used your {MAX_FREE} free AI analyses today</h3>
+          <p style={{ color: "#9fb0c1", lineHeight: 1.7, marginBottom: "24px", maxWidth: "500px", margin: "0 auto 24px" }}>
+            Free tier: <strong style={{ color: "white" }}>{MAX_FREE} AI room analyses per day</strong>.<br />
+            Your daily limit resets at midnight. You can still post a job without photos — it will be priced at the standard heavy-clean rate (£30/hr).
+          </p>
+          <div style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" }}>
+            <div style={{ background: "rgba(245,158,11,.15)", border: "1px solid rgba(245,158,11,.3)", borderRadius: "14px", padding: "16px 24px", maxWidth: "280px" }}>
+              <div style={{ color: "#f59e0b", fontWeight: 800, marginBottom: "6px" }}>Coming soon: Premium</div>
+              <div style={{ color: "#9fb0c1", fontSize: "13px", lineHeight: 1.6 }}>Unlimited AI analyses · Priority matching · Verified booking · Escrow protection</div>
+            </div>
           </div>
         </div>
       )}
