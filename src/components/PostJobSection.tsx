@@ -83,8 +83,7 @@ export default function PostJobSection() {
     });
 
     try {
-      const base64 = await fileToBase64(file);
-      const mediaType = file.type || "image/jpeg";
+      const { base64, mediaType } = await compressAndEncode(file);
 
       const res = await fetch("/api/analyze-room", {
         method: "POST",
@@ -112,15 +111,26 @@ export default function PostJobSection() {
     }
   }
 
-  function fileToBase64(file: File): Promise<string> {
+  function compressAndEncode(file: File): Promise<{ base64: string; mediaType: string }> {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        resolve(result.split(",")[1]);
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        const MAX = 1200;
+        let { width, height } = img;
+        if (width > MAX) { height = Math.round(height * MAX / width); width = MAX; }
+        else if (height > MAX) { width = Math.round(width * MAX / height); height = MAX; }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d")!;
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
+        URL.revokeObjectURL(url);
+        resolve({ base64: dataUrl.split(",")[1], mediaType: "image/jpeg" });
       };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
+      img.onerror = reject;
+      img.src = url;
     });
   }
 
