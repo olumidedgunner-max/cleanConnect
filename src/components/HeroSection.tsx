@@ -29,9 +29,9 @@ export default function HeroSection() {
             Every job protected by escrow.
           </p>
           <div style={{ display: "flex", gap: "18px", flexWrap: "wrap" }}>
-            <a href="#post-job" style={{ padding: "16px 28px", borderRadius: "14px", border: "none", fontSize: "16px", fontWeight: 700, cursor: "pointer", background: "linear-gradient(135deg,#1ea7ff,#0077ff)", color: "white", textDecoration: "none" }}>
+            <Link href="/post-job" style={{ padding: "16px 28px", borderRadius: "14px", border: "none", fontSize: "16px", fontWeight: 700, cursor: "pointer", background: "linear-gradient(135deg,#1ea7ff,#0077ff)", color: "white", textDecoration: "none" }}>
               Post a Cleaning Job
-            </a>
+            </Link>
             <Link href="/register-cleaner" style={{ padding: "16px 28px", borderRadius: "14px", border: "1px solid rgba(255,255,255,.1)", fontSize: "16px", fontWeight: 700, cursor: "pointer", background: "rgba(255,255,255,.08)", backdropFilter: "blur(12px)", color: "white", textDecoration: "none" }}>
               Start Earning as a Cleaner
             </Link>
