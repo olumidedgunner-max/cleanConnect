@@ -27,6 +27,21 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Find a Cleaner CTA */}
+      <section style={{ padding: "0 30px 70px", background: "#07111f" }}>
+        <div style={{ maxWidth: "1100px", margin: "auto", background: "linear-gradient(135deg,#0d1f35,#0a1628)", borderRadius: "28px", padding: "50px 60px", border: "1px solid rgba(34,197,94,.15)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "30px" }}>
+          <div>
+            <h2 style={{ fontSize: "36px", fontWeight: 900, marginBottom: "12px" }}>Browse cleaners in your area</h2>
+            <p style={{ color: "#9fb0c1", fontSize: "17px", lineHeight: 1.6, maxWidth: "500px" }}>
+              View individual cleaners and companies near you. Negotiate their rate by up to 20% and send a direct job offer.
+            </p>
+          </div>
+          <Link href="/cleaners" style={{ padding: "20px 40px", borderRadius: "16px", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "white", textDecoration: "none", fontWeight: 800, fontSize: "18px", whiteSpace: "nowrap" }}>
+            Find Cleaners →
+          </Link>
+        </div>
+      </section>
+
       <JobListings />
       <HowItWorks />
       <FeeStructure />

@@ -25,6 +25,10 @@ export type Cleaner = {
   city: string;
   bio: string;
   registeredAt: string;
+  type?: "individual" | "company";
+  rate?: number;
+  radius?: number;
+  companyNumber?: string;
 };
 
 export type Business = {
@@ -70,29 +74,17 @@ export function CleanConnectProvider({ children }: { children: ReactNode }) {
 
   function addJob(j: Omit<Job, "id" | "status" | "postedAt">) {
     const newJob: Job = { ...j, id: Date.now().toString(), status: "awaiting", postedAt: new Date().toISOString() };
-    setJobs((prev) => {
-      const updated = [newJob, ...prev];
-      localStorage.setItem("cc_jobs", JSON.stringify(updated));
-      return updated;
-    });
+    setJobs((prev) => { const u = [newJob, ...prev]; localStorage.setItem("cc_jobs", JSON.stringify(u)); return u; });
   }
 
   function addCleaner(c: Omit<Cleaner, "id" | "registeredAt">) {
-    const newCleaner: Cleaner = { ...c, id: Date.now().toString(), registeredAt: new Date().toISOString() };
-    setCleaners((prev) => {
-      const updated = [newCleaner, ...prev];
-      localStorage.setItem("cc_cleaners", JSON.stringify(updated));
-      return updated;
-    });
+    const n: Cleaner = { ...c, id: Date.now().toString(), registeredAt: new Date().toISOString() };
+    setCleaners((prev) => { const u = [n, ...prev]; localStorage.setItem("cc_cleaners", JSON.stringify(u)); return u; });
   }
 
   function addBusiness(b: Omit<Business, "id" | "registeredAt">) {
-    const newBusiness: Business = { ...b, id: Date.now().toString(), registeredAt: new Date().toISOString() };
-    setBusinesses((prev) => {
-      const updated = [newBusiness, ...prev];
-      localStorage.setItem("cc_businesses", JSON.stringify(updated));
-      return updated;
-    });
+    const n: Business = { ...b, id: Date.now().toString(), registeredAt: new Date().toISOString() };
+    setBusinesses((prev) => { const u = [n, ...prev]; localStorage.setItem("cc_businesses", JSON.stringify(u)); return u; });
   }
 
   return (

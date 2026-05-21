@@ -9,6 +9,7 @@ export default function Navbar() {
       <ul style={{ display: "flex", gap: "20px", listStyle: "none", alignItems: "center" }}>
         <li><Link href="/" style={{ color: "white", textDecoration: "none", opacity: 0.85, fontSize: "15px" }}>Home</Link></li>
         <li><Link href="/dashboard" style={{ color: "white", textDecoration: "none", opacity: 0.85, fontSize: "15px" }}>Dashboard</Link></li>
+        <li><Link href="/cleaners" style={{ color: "white", textDecoration: "none", opacity: 0.85, fontSize: "15px" }}>Find Cleaners</Link></li>
         <li>
           <Link href="/post-job" style={{ display: "block", background: "linear-gradient(135deg,#1ea7ff,#0077ff)", padding: "10px 20px", borderRadius: "12px", fontWeight: 700, textDecoration: "none", color: "white", fontSize: "14px" }}>
             Post a Job
