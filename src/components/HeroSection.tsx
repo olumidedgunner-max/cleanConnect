@@ -2,7 +2,7 @@ import Link from "next/link";
 import Navbar from "./Navbar";
 
 const BG_IMAGE = "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=1600&auto=format&fit=crop";
-const VIDEO_URL = "https://videos.pexels.com/video-files/6195191/6195191-hd_1920_1080_25fps.mp4";
+const VIDEO_URL = "/happycleaner.mp4";
 
 export default function HeroSection() {
   return (
