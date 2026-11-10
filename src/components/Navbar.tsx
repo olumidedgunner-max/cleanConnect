@@ -17,12 +17,7 @@ export default function Navbar() {
         </li>
         <li>
           <Link href="/register-cleaner" style={{ display: "block", background: "linear-gradient(135deg,#22c55e,#16a34a)", padding: "10px 20px", borderRadius: "12px", fontWeight: 700, textDecoration: "none", color: "white", fontSize: "14px" }}>
-            Register as Cleaner
-          </Link>
-        </li>
-        <li>
-          <Link href="/register-business" style={{ display: "block", background: "linear-gradient(135deg,#f59e0b,#d97706)", padding: "10px 20px", borderRadius: "12px", fontWeight: 700, textDecoration: "none", color: "white", fontSize: "14px" }}>
-            Register Business
+            Service Provider
           </Link>
         </li>
       </ul>

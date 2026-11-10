@@ -13,17 +13,13 @@ const ROOM_TYPES = [
 
 type AIAnalysis = {
   room_type: string;
-  room_size: string;
-  dirtiness_score: number;
-  dirtiness_level: string;
-  issues_detected: string[];
-  base_hours: number;
-  size_multiplier: number;
-  dirt_multiplier: number;
-  estimated_hours: number;
-  hourly_rate: number;
-  price: number;
-  condition_summary: string;
+  cleanliness_score: number;
+  clutter_score: number;
+  estimated_cleaning_hours: number;
+  risk_level: string;
+  suggested_price_gbp: number;
+  recommended_cleaners: number;
+  reasoning: string;
 };
 
 type RoomEntry = {
@@ -32,6 +28,7 @@ type RoomEntry = {
   analyzing: boolean;
   analysis: AIAnalysis | null;
   error: string | null;
+  model?: "gpt-4o-mini" | "gpt-4o";
 };
 
 type Rooms = Record<string, RoomEntry[]>;
@@ -49,20 +46,41 @@ function dirtBg(score: number) {
   return "rgba(239,68,68,.1)";
 }
 
+function riskColor(risk: string) {
+  if (risk === "Low") return "#22c55e";
+  if (risk === "Moderate") return "#f59e0b";
+  if (risk === "High") return "#ef4444";
+  return "#7c2d12";
+}
+
+const PERSONAL_DOMAINS = ["gmail.com","yahoo.com","hotmail.com","outlook.com","icloud.com","live.com","msn.com","aol.com","protonmail.com","me.com","mac.com","googlemail.com","yahoo.co.uk","hotmail.co.uk","live.co.uk"];
+function isBusinessEmail(email: string) {
+  const domain = email.split("@")[1]?.toLowerCase();
+  return domain && !PERSONAL_DOMAINS.includes(domain);
+}
+
+const UK_VAT_RATE = 0.20;
+
 const inputStyle = { width: "100%", padding: "14px 18px", borderRadius: "12px", border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "white", fontSize: "16px", outline: "none" };
 const labelStyle = { display: "block" as const, color: "#9fb0c1", fontSize: "13px", fontWeight: 700, marginBottom: "8px", textTransform: "uppercase" as const, letterSpacing: "1px" };
 
 export default function PostJobSection() {
   const { addJob } = useCleanConnect();
+  const [posterType, setPosterType] = useState<"individual" | "business" | null>(null);
   const [counts, setCounts] = useState<Record<string, number>>({ kitchen: 0, living: 0, bedroom: 0, playroom: 0, toilet: 0 });
   const [rooms, setRooms] = useState<Rooms>({});
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [postcode, setPostcode] = useState("");
   const [city, setCity] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [vatNumber, setVatNumber] = useState("");
+  const [emailError, setEmailError] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [remaining, setRemaining] = useState(MAX_FREE);
   const [limitReached, setLimitReached] = useState(false);
+  const [insureContent, setInsureContent] = useState(false);
+  const [contentValue, setContentValue] = useState("");
   const fileInputRef = useRef<Record<string, HTMLInputElement | null>>({});
 
   useEffect(() => {
@@ -104,10 +122,13 @@ export default function PostJobSection() {
     try {
       const { base64, mediaType } = await compressAndEncode(file);
 
+      // Only switch to gpt-4o when declared content value exceeds £10,000
+      const useHighAccuracy = insureContent && parseFloat(contentValue) > 10000;
+
       const res = await fetch("/api/analyze-room", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageBase64: base64, mediaType }),
+        body: JSON.stringify({ imageBase64: base64, mediaType, roomKey: key, roomIndex: index, useHighAccuracy }),
       });
 
       const data = await res.json();
@@ -115,7 +136,7 @@ export default function PostJobSection() {
       setRooms((r) => {
         const updated = [...(r[key] || [])];
         if (data.success) {
-          updated[index] = { ...updated[index], analyzing: false, analysis: data.analysis };
+          updated[index] = { ...updated[index], analyzing: false, analysis: data.analysis, model: useHighAccuracy ? "gpt-4o" : "gpt-4o-mini" };
           incrementUsage();
           setRemaining(getRemainingAnalyses());
           setLimitReached(hasReachedLimit());
@@ -138,7 +159,7 @@ export default function PostJobSection() {
       const img = new Image();
       const url = URL.createObjectURL(file);
       img.onload = () => {
-        const MAX = 1200;
+        const MAX = 768;
         let { width, height } = img;
         if (width > MAX) { height = Math.round(height * MAX / width); width = MAX; }
         else if (height > MAX) { width = Math.round(width * MAX / height); height = MAX; }
@@ -147,7 +168,7 @@ export default function PostJobSection() {
         canvas.height = height;
         const ctx = canvas.getContext("2d")!;
         ctx.drawImage(img, 0, 0, width, height);
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.65);
         URL.revokeObjectURL(url);
         resolve({ base64: dataUrl.split(",")[1], mediaType: "image/jpeg" });
       };
@@ -165,23 +186,30 @@ export default function PostJobSection() {
 
   // Calculate totals from AI analysis or fallback
   const subtotal = allRows.reduce((sum, { entry }) => {
-    if (entry.analysis) return sum + entry.analysis.price;
+    if (entry.analysis) return sum + entry.analysis.suggested_price_gbp;
     return sum + 30; // fallback heavy rate
   }, 0);
   const platformFee = Math.round(subtotal * 0.05 * 100) / 100;
-  const total = Math.round((subtotal + platformFee) * 100) / 100;
+  const insurancePremium = insureContent ? Math.min(Math.round(Math.min(parseFloat(contentValue) || 0, 4000) * 0.08 * 100) / 100, 320) : 0;
+  const vatAmount = posterType === "business" ? Math.round((subtotal + platformFee) * UK_VAT_RATE * 100) / 100 : 0;
+  const total = Math.round((subtotal + platformFee + insurancePremium + vatAmount) * 100) / 100;
 
   const allAnalyzed = allRows.length > 0 && allRows.every((r) => r.entry.analysis !== null || (r.entry.hasPhoto && r.entry.error !== null) || !r.entry.hasPhoto);
   const anyAnalyzing = allRows.some((r) => r.entry.analyzing);
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!email || !phone || !postcode || !city) return;
+    if (posterType === "business" && !isBusinessEmail(email)) {
+      setEmailError("Business accounts require a company email address — not Gmail, Hotmail, Yahoo, etc.");
+      return;
+    }
+    setEmailError("");
     const conditions: Record<string, string> = {};
     allRows.forEach(({ key, index, entry }) => {
-      const level = entry.analysis?.dirtiness_level?.toLowerCase() || "none";
-      conditions[`${key}-${index}`] = level === "light" ? "moderate" : level === "heavy" || level === "extreme" ? "none" : "medium";
+      const risk = entry.analysis?.risk_level?.toLowerCase() || "high";
+      conditions[`${key}-${index}`] = risk === "low" ? "clean" : risk === "moderate" ? "medium" : "heavy";
     });
-    addJob({ rooms: ROOM_TYPES.filter(({ key }) => counts[key] > 0).map(({ key, label }) => ({ type: label, count: counts[key] })), totalRooms, subtotal, total, email, phone, postcode: postcode.toUpperCase(), city, conditions });
+    await addJob({ rooms: ROOM_TYPES.filter(({ key }) => counts[key] > 0).map(({ key, label }) => ({ type: label, count: counts[key] })), totalRooms, subtotal, total, email, phone, postcode: postcode.toUpperCase(), city, conditions });
     setSubmitted(true);
   }
 
@@ -191,12 +219,30 @@ export default function PostJobSection() {
     <section style={{ padding: "90px 30px", maxWidth: "1100px", margin: "auto" }}>
       <h2 style={{ fontSize: "46px", fontWeight: 900, marginBottom: "12px" }}>Post a Clean Job</h2>
       <p style={{ color: "#9fb0c1", fontSize: "18px", lineHeight: 1.7, marginBottom: "50px", maxWidth: "700px" }}>
-        Tell us your rooms, upload photos and <strong style={{ color: "#57c7ff" }}>Claude AI</strong> will analyse each room — detecting dirtiness, estimating hours, and pricing fairly. Each room priced at £20/hr base.
+        Tell us your rooms, upload photos and <strong style={{ color: "#57c7ff" }}>AI</strong> will analyse each room — detecting dirtiness, estimating hours, and pricing fairly.
       </p>
 
-      {/* Step 1 */}
+      {/* Step 0 — Who is posting? */}
       <div style={card}>
-        <h3 style={{ fontSize: "22px", fontWeight: 800, marginBottom: "24px" }}>Step 1 — How many of each room?</h3>
+        <h3 style={{ fontSize: "22px", fontWeight: 800, marginBottom: "8px" }}>Step 1 — Who is posting this job?</h3>
+        <p style={{ color: "#9fb0c1", fontSize: "14px", marginBottom: "24px" }}>Select your account type. Business accounts require a company email and UK VAT (20%) is applied.</p>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "18px" }}>
+          <button onClick={() => setPosterType("individual")} style={{ padding: "22px 24px", borderRadius: "16px", border: `2px solid ${posterType === "individual" ? "#1ea7ff" : "rgba(255,255,255,.08)"}`, background: posterType === "individual" ? "rgba(30,167,255,.1)" : "rgba(255,255,255,.03)", color: "white", cursor: "pointer", textAlign: "left" }}>
+            <div style={{ fontSize: "28px", marginBottom: "10px" }}>🧑</div>
+            <div style={{ fontWeight: 800, fontSize: "16px", marginBottom: "4px" }}>Individual</div>
+            <div style={{ color: "#9fb0c1", fontSize: "13px" }}>Posting for your home or personal property. No VAT applied.</div>
+          </button>
+          <button onClick={() => setPosterType("business")} style={{ padding: "22px 24px", borderRadius: "16px", border: `2px solid ${posterType === "business" ? "#f59e0b" : "rgba(255,255,255,.08)"}`, background: posterType === "business" ? "rgba(245,158,11,.08)" : "rgba(255,255,255,.03)", color: "white", cursor: "pointer", textAlign: "left" }}>
+            <div style={{ fontSize: "28px", marginBottom: "10px" }}>🏢</div>
+            <div style={{ fontWeight: 800, fontSize: "16px", marginBottom: "4px" }}>Business</div>
+            <div style={{ color: "#9fb0c1", fontSize: "13px" }}>Posting for a company or commercial property. UK VAT (20%) applied. Business email required.</div>
+          </button>
+        </div>
+      </div>
+
+      {/* Step 2 — Rooms */}
+      {posterType && <div style={card}>
+        <h3 style={{ fontSize: "22px", fontWeight: 800, marginBottom: "24px" }}>Step 2 — How many of each room?</h3>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "20px" }}>
           {ROOM_TYPES.map(({ key, label }) => (
             <div key={key} style={{ textAlign: "center" }}>
@@ -209,14 +255,14 @@ export default function PostJobSection() {
             </div>
           ))}
         </div>
-      </div>
+      </div>}
 
-      {/* Step 2 — AI Photo Analysis */}
-      {totalRooms > 0 && (
+      {/* Step 3 — AI Photo Analysis */}
+      {posterType && totalRooms > 0 && (
         <div style={card}>
           <div style={{ marginBottom: "24px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px", flexWrap: "wrap", gap: "12px" }}>
-            <h3 style={{ fontSize: "22px", fontWeight: 800 }}>Step 2 — Upload photos for AI pricing</h3>
+            <h3 style={{ fontSize: "22px", fontWeight: 800 }}>Step 3 — Upload photos for AI pricing</h3>
             {/* Daily usage counter */}
             <div style={{
               padding: "10px 18px", borderRadius: "12px",
@@ -231,7 +277,7 @@ export default function PostJobSection() {
           </div>
             <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap", marginBottom: "4px" }}>
               <div style={{ background: "rgba(87,199,255,.1)", border: "1px solid rgba(87,199,255,.25)", borderRadius: "10px", padding: "8px 14px", fontSize: "13px", color: "#57c7ff", fontWeight: 600 }}>
-                🤖 Claude AI analyses each photo
+                🤖 AI analyses each photo
               </div>
               <p style={{ color: "#9fb0c1", fontSize: "14px" }}>No photo = £30/hr (heavy clean assumed). Photos unlock fair AI pricing.</p>
             </div>
@@ -249,7 +295,7 @@ export default function PostJobSection() {
                     {entry.analyzing && (
                       <div style={{ color: "#9fb0c1", fontSize: "13px", display: "flex", alignItems: "center", gap: "8px" }}>
                         <span style={{ display: "inline-block", width: "14px", height: "14px", border: "2px solid #57c7ff", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-                        Claude AI analysing...
+                        AI analysing...
                       </div>
                     )}
                     <input type="file" accept="image/*" style={{ display: "none" }} ref={(el) => { fileInputRef.current[`${key}-${index}`] = el; }} onChange={(e) => { if (e.target.files?.[0]) handlePhoto(key, index, e.target.files[0]); }} />
@@ -261,41 +307,37 @@ export default function PostJobSection() {
 
                 {/* AI Analysis Result */}
                 {entry.analysis && (
-                  <div style={{ background: dirtBg(entry.analysis.dirtiness_score), border: `1px solid ${dirtColor(entry.analysis.dirtiness_score)}40`, borderRadius: "14px", padding: "18px" }}>
+                  <div style={{ background: dirtBg(entry.analysis.cleanliness_score), border: `1px solid ${dirtColor(entry.analysis.cleanliness_score)}40`, borderRadius: "14px", padding: "18px" }}>
+                    <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "10px" }}>
+                      <span style={{ padding: "3px 10px", borderRadius: "999px", fontSize: "11px", fontWeight: 700, background: entry.model === "gpt-4o" ? "rgba(245,158,11,.15)" : "rgba(87,199,255,.1)", color: entry.model === "gpt-4o" ? "#f59e0b" : "#57c7ff" }}>
+                        {entry.model === "gpt-4o" ? "⚡ gpt-4o (high accuracy)" : "🤖 gpt-4o-mini"}
+                      </span>
+                    </div>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "16px", marginBottom: "14px" }}>
                       <div>
                         <div style={{ color: "#9fb0c1", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>Room Type</div>
                         <div style={{ fontWeight: 700, fontSize: "15px" }}>{entry.analysis.room_type}</div>
                       </div>
                       <div>
-                        <div style={{ color: "#9fb0c1", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>Size</div>
-                        <div style={{ fontWeight: 700, fontSize: "15px" }}>{entry.analysis.room_size}</div>
+                        <div style={{ color: "#9fb0c1", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>Cleanliness</div>
+                        <div style={{ fontWeight: 900, fontSize: "16px", color: dirtColor(entry.analysis.cleanliness_score) }}>{entry.analysis.cleanliness_score}/10</div>
                       </div>
                       <div>
-                        <div style={{ color: "#9fb0c1", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>Dirt Score</div>
-                        <div style={{ fontWeight: 900, fontSize: "18px", color: dirtColor(entry.analysis.dirtiness_score) }}>{entry.analysis.dirtiness_score}/10 — {entry.analysis.dirtiness_level}</div>
+                        <div style={{ color: "#9fb0c1", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>Risk Level</div>
+                        <div style={{ fontWeight: 700, fontSize: "15px", color: riskColor(entry.analysis.risk_level) }}>{entry.analysis.risk_level}</div>
                       </div>
                       <div>
                         <div style={{ color: "#9fb0c1", fontSize: "11px", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>AI Price</div>
-                        <div style={{ fontWeight: 900, fontSize: "20px", color: "#57c7ff" }}>£{entry.analysis.price}</div>
-                        <div style={{ color: "#9fb0c1", fontSize: "11px" }}>{entry.analysis.estimated_hours}hrs × £20</div>
+                        <div style={{ fontWeight: 900, fontSize: "20px", color: "#57c7ff" }}>£{entry.analysis.suggested_price_gbp}</div>
+                        <div style={{ color: "#9fb0c1", fontSize: "11px" }}>{entry.analysis.estimated_cleaning_hours}hrs × £20</div>
                       </div>
                     </div>
-                    {entry.analysis.issues_detected.length > 0 && (
-                      <div style={{ marginBottom: "10px" }}>
-                        <span style={{ color: "#9fb0c1", fontSize: "12px", marginRight: "8px" }}>Issues:</span>
-                        {entry.analysis.issues_detected.map((issue) => (
-                          <span key={issue} style={{ display: "inline-block", margin: "2px 4px", padding: "3px 10px", borderRadius: "999px", background: "rgba(255,255,255,.08)", fontSize: "12px", color: "#c5d0dc" }}>{issue}</span>
-                        ))}
-                      </div>
-                    )}
-                    <div style={{ color: "#9fb0c1", fontSize: "13px", fontStyle: "italic" }}>"{entry.analysis.condition_summary}"</div>
-                    <div style={{ marginTop: "10px", display: "flex", gap: "16px", fontSize: "12px", color: "#9fb0c1" }}>
-                      <span>Base: {entry.analysis.base_hours}hr</span>
-                      <span>Size ×{entry.analysis.size_multiplier}</span>
-                      <span>Dirt ×{entry.analysis.dirt_multiplier}</span>
-                      <span>= {entry.analysis.estimated_hours}hrs</span>
+                    <div style={{ display: "flex", gap: "16px", fontSize: "12px", color: "#9fb0c1", marginBottom: "10px" }}>
+                      <span>Clutter: {entry.analysis.clutter_score}/10</span>
+                      <span>Est. hours: {entry.analysis.estimated_cleaning_hours}</span>
+                      <span>Cleaners needed: {entry.analysis.recommended_cleaners}</span>
                     </div>
+                    <div style={{ color: "#9fb0c1", fontSize: "13px", fontStyle: "italic" }}>"{entry.analysis.reasoning}"</div>
                   </div>
                 )}
 
@@ -314,43 +356,118 @@ export default function PostJobSection() {
         </div>
       )}
 
-      {/* Step 3 — Price Summary */}
-      {totalRooms > 0 && !anyAnalyzing && (
+      {/* Step 4 — Price Summary + Insurance */}
+      {posterType && totalRooms > 0 && !anyAnalyzing && (
         <div style={card}>
-          <h3 style={{ fontSize: "22px", fontWeight: 800, marginBottom: "24px" }}>Step 3 — Price Summary</h3>
-          <div style={{ maxWidth: "500px" }}>
+          <h3 style={{ fontSize: "22px", fontWeight: 800, marginBottom: "24px" }}>Step 4 — Price Summary</h3>
+          <div style={{ maxWidth: "560px" }}>
             {allRows.map(({ label, index, entry }, i) => (
               <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid rgba(255,255,255,.05)", color: "#c5d0dc", fontSize: "14px" }}>
-                <span>{label} {index + 1} {entry.analysis ? `(${entry.analysis.dirtiness_level}, ${entry.analysis.estimated_hours}hrs)` : "(no photo, 1hr)"}</span>
-                <span style={{ fontWeight: 700 }}>£{entry.analysis ? entry.analysis.price : 30}</span>
+                <span>{label} {index + 1} {entry.analysis ? `(Risk: ${entry.analysis.risk_level}, ${entry.analysis.estimated_cleaning_hours}hrs)` : "(no photo, heavy clean assumed)"}</span>
+                <span style={{ fontWeight: 700 }}>£{entry.analysis ? entry.analysis.suggested_price_gbp : 30}</span>
               </div>
             ))}
             <div style={{ display: "flex", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid rgba(255,255,255,.05)", color: "#c5d0dc", fontSize: "14px" }}>
               <span>Platform fee (5%)</span>
               <span style={{ fontWeight: 700 }}>£{platformFee.toFixed(2)}</span>
             </div>
+
+            {/* Insurance option */}
+            <div style={{ background: "rgba(87,199,255,.06)", border: "1px solid rgba(87,199,255,.2)", borderRadius: "14px", padding: "18px", margin: "16px 0" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: insureContent ? "14px" : "0" }}>
+                <input type="checkbox" id="insure" checked={insureContent} onChange={(e) => setInsureContent(e.target.checked)} style={{ width: "18px", height: "18px", cursor: "pointer" }} />
+                <label htmlFor="insure" style={{ fontWeight: 700, color: "#57c7ff", cursor: "pointer", fontSize: "14px" }}>
+                  Add Content Insurance — 8% of declared value (max £4,000 cover)
+                </label>
+              </div>
+              {insureContent && (
+                <div>
+                  <label style={labelStyle}>Estimated content value (£)</label>
+                  <input type="number" value={contentValue} onChange={(e) => setContentValue(e.target.value)} placeholder="e.g. 2000" min="0" max="4000" style={{ ...inputStyle, maxWidth: "220px" }} />
+                  {insurancePremium > 0 && (
+                    <div style={{ marginTop: "10px", color: "#57c7ff", fontWeight: 700, fontSize: "14px" }}>
+                      Insurance premium: £{insurancePremium.toFixed(2)} (covers up to £{Math.min(parseFloat(contentValue) || 0, 4000).toFixed(0)})
+                    </div>
+                  )}
+                  <div style={{ marginTop: "8px", color: "#9fb0c1", fontSize: "12px" }}>Cover is capped at £4,000. Premium = 8% of declared value.</div>
+                </div>
+              )}
+            </div>
+
+            {insurancePremium > 0 && (
+              <div style={{ display: "flex", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid rgba(255,255,255,.05)", color: "#c5d0dc", fontSize: "14px" }}>
+                <span>Content insurance (8%)</span>
+                <span style={{ fontWeight: 700 }}>£{insurancePremium.toFixed(2)}</span>
+              </div>
+            )}
+
+            {posterType === "business" && (
+              <div style={{ display: "flex", justifyContent: "space-between", padding: "12px 0", borderBottom: "1px solid rgba(255,255,255,.05)", color: "#f59e0b", fontSize: "14px" }}>
+                <span>UK VAT (20%)</span>
+                <span style={{ fontWeight: 700 }}>£{vatAmount.toFixed(2)}</span>
+              </div>
+            )}
+
             <div style={{ display: "flex", justifyContent: "space-between", padding: "18px 0", fontSize: "24px", fontWeight: 900 }}>
-              <span>Total</span>
+              <span>Total {posterType === "business" ? "(inc. VAT)" : ""}</span>
               <span style={{ color: "#57c7ff" }}>£{total.toFixed(2)}</span>
             </div>
+
+            {posterType === "business" && (
+              <div style={{ background: "rgba(245,158,11,.06)", border: "1px solid rgba(245,158,11,.2)", borderRadius: "12px", padding: "12px 16px", fontSize: "12px", color: "#9fb0c1", marginBottom: "12px" }}>
+                VAT receipt will be issued on payment. UK standard rate 20% applied to service and platform fee.
+              </div>
+            )}
+
             <div style={{ background: "rgba(30,167,255,.08)", border: "1px solid rgba(30,167,255,.2)", borderRadius: "14px", padding: "16px", fontSize: "13px", color: "#9fb0c1", lineHeight: 1.6 }}>
-              The cleaner pays a <strong style={{ color: "#57c7ff" }}>7.5% matching fee</strong> from their payout. Funds held in escrow until you confirm completion.
+              The cleaner pays a <strong style={{ color: "#57c7ff" }}>7.5% matching fee</strong> from their payout. Funds held in <strong style={{ color: "#57c7ff" }}>escrow</strong> and released <strong style={{ color: "white" }}>24 hours after job completion</strong> — no automatic release.
             </div>
           </div>
         </div>
       )}
 
-      {/* Step 4 — Contact */}
-      {totalRooms > 0 && !anyAnalyzing && (
+      {/* Step 5 — Contact */}
+      {posterType && totalRooms > 0 && !anyAnalyzing && (
         <div style={card}>
-          <h3 style={{ fontSize: "22px", fontWeight: 800, marginBottom: "8px" }}>Step 4 — Contact & Location</h3>
-          <p style={{ color: "#9fb0c1", fontSize: "14px", marginBottom: "24px" }}>Just email, phone, postcode and city for now. Full address is collected securely at the Stripe payment step.</p>
+          <h3 style={{ fontSize: "22px", fontWeight: 800, marginBottom: "8px" }}>Step 5 — Contact & Location</h3>
+          <p style={{ color: "#9fb0c1", fontSize: "14px", marginBottom: "24px" }}>
+            {posterType === "business" ? "Business email required. Full address collected at payment." : "Just email, phone, postcode and city for now. Full address collected securely at the Stripe payment step."}
+          </p>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
-            <div><label style={labelStyle}>Email Address</label><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" style={inputStyle} /></div>
+            {posterType === "business" && (
+              <>
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <label style={labelStyle}>Company Name</label>
+                  <input type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="Acme Facilities Ltd" style={inputStyle} />
+                </div>
+                <div>
+                  <label style={labelStyle}>VAT Number (optional)</label>
+                  <input type="text" value={vatNumber} onChange={(e) => setVatNumber(e.target.value)} placeholder="GB123456789" style={inputStyle} />
+                </div>
+              </>
+            )}
+            <div>
+              <label style={labelStyle}>{posterType === "business" ? "Business Email" : "Email Address"}</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => { setEmail(e.target.value); setEmailError(""); }}
+                placeholder={posterType === "business" ? "you@yourcompany.com" : "your@email.com"}
+                style={{ ...inputStyle, borderColor: posterType === "business" && email && !isBusinessEmail(email) ? "rgba(239,68,68,.6)" : "rgba(255,255,255,.1)" }}
+              />
+              {posterType === "business" && email && !isBusinessEmail(email) && (
+                <div style={{ marginTop: "6px", fontSize: "12px", color: "#ef4444" }}>Business accounts require a company domain email — not Gmail, Hotmail, Yahoo, etc.</div>
+              )}
+            </div>
             <div><label style={labelStyle}>Phone Number</label><input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+44 7700 000000" style={inputStyle} /></div>
             <div><label style={labelStyle}>Postcode</label><input type="text" value={postcode} onChange={(e) => setPostcode(e.target.value)} placeholder="SW1A 1AA" style={inputStyle} /></div>
             <div><label style={labelStyle}>City</label><input type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="London" style={inputStyle} /></div>
           </div>
+          {emailError && (
+            <div style={{ marginTop: "16px", padding: "12px 16px", borderRadius: "10px", background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.3)", color: "#ef4444", fontSize: "13px" }}>
+              {emailError}
+            </div>
+          )}
         </div>
       )}
 
@@ -372,15 +489,15 @@ export default function PostJobSection() {
         </div>
       )}
 
-      {totalRooms > 0 && !anyAnalyzing && !submitted && (
+      {posterType && totalRooms > 0 && !anyAnalyzing && !submitted && (
         <button onClick={handleSubmit} style={{ padding: "20px 50px", borderRadius: "16px", border: "none", background: "linear-gradient(135deg,#1ea7ff,#0077ff)", color: "white", fontSize: "18px", fontWeight: 800, cursor: "pointer", width: "100%" }}>
-          Post Job — £{total.toFixed(2)} (held in escrow)
+          Post Job — £{total.toFixed(2)} {posterType === "business" ? "(inc. VAT, held in escrow)" : "(held in escrow)"}
         </button>
       )}
 
       {anyAnalyzing && totalRooms > 0 && (
         <div style={{ textAlign: "center", padding: "20px", color: "#9fb0c1", fontSize: "16px" }}>
-          🤖 Claude AI is analysing your room photos... please wait
+          🤖 AI is analysing your room photos... please wait
         </div>
       )}
 

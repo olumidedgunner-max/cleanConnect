@@ -14,9 +14,9 @@ export default function RegisterBusinessSection() {
 
   function set(k: string, v: string) { setForm((f) => ({ ...f, [k]: v })); }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!form.companyName || !form.contactName || !form.email || !form.phone || !form.postcode || !form.city) return;
-    addBusiness(form);
+    await addBusiness(form);
     setSubmitted(true);
   }
 

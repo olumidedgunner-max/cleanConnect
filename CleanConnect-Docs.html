@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body { font-family: Arial, sans-serif; font-size: 13px; color: #1a202c; max-width: 800px; margin: 40px auto; line-height: 1.7; padding: 0 20px; }
+  h1 { font-size: 32px; font-weight: 900; color: #0077ff; border-bottom: 3px solid #0077ff; padding-bottom: 12px; margin-bottom: 8px; }
+  h2 { font-size: 20px; font-weight: 700; color: #0d1727; margin-top: 36px; border-left: 4px solid #0077ff; padding-left: 12px; }
+  h3 { font-size: 15px; font-weight: 700; color: #2d3748; margin-top: 24px; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 12px; }
+  th { background: #0077ff; color: white; padding: 10px 14px; text-align: left; font-weight: 700; }
+  td { padding: 8px 14px; border-bottom: 1px solid #e2e8f0; }
+  tr:nth-child(even) td { background: #f7fafc; }
+  code { background: #edf2f7; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-family: monospace; color: #c53030; }
+  pre { background: #1a202c; color: #e2e8f0; padding: 18px; border-radius: 10px; font-size: 12px; line-height: 1.6; }
+  pre code { background: none; color: inherit; padding: 0; }
+  a { color: #0077ff; }
+  hr { border: none; border-top: 1px solid #e2e8f0; margin: 32px 0; }
+</style>
+</head>
+<body><h1>CTSCleaner (CleanConnect)</h1>
+<p>A marketplace platform connecting customers with individual cleaners and cleaning companies. AI-powered room analysis determines fair pricing, with built-in negotiation, escrow payments, KYC verification, and email OTP validation.</p>
+<p><strong>Live:</strong> https://ctscleaner.vercel.app</p>
+<hr />
+<h2>Tech Stack</h2>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Technology</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Framework</td>
+<td>Next.js 16 (App Router)</td>
+</tr>
+<tr>
+<td>Language</td>
+<td>TypeScript 5</td>
+</tr>
+<tr>
+<td>Styling</td>
+<td>Tailwind CSS 4</td>
+</tr>
+<tr>
+<td>Database</td>
+<td>Supabase (PostgreSQL)</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td>Supabase Storage (room photos)</td>
+</tr>
+<tr>
+<td>AI Vision</td>
+<td>OpenAI gpt-4o-mini / gpt-4o</td>
+</tr>
+<tr>
+<td>Email</td>
+<td>Resend</td>
+</tr>
+<tr>
+<td>Deployment</td>
+<td>Vercel (project: ctscleaner)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>User Journeys</h2>
+<p>There are two top-level paths on the platform:</p>
+<h3>1. Post a Job (Customer Side)</h3>
+<p>Anyone needing cleaning services — individual or business.</p>
+<ul>
+<li><strong>Individual</strong> — posts for home/personal property. No VAT applied.</li>
+<li><strong>Business</strong> — posts for commercial property. UK VAT (20%) auto-calculated. Business domain email required (no Gmail/Hotmail/Yahoo etc.).</li>
+</ul>
+<h3>2. Service Provider (Cleaner Side)</h3>
+<p>Anyone offering cleaning services — individual or company.</p>
+<ul>
+<li><strong>Individual Cleaner</strong> — any email. One-off onboarding fee: £99 (non-refundable).</li>
+<li><strong>Cleaning Company</strong> — business domain email required. One-off onboarding fee: £179 (non-refundable).</li>
+</ul>
+<hr />
+<h2>Features</h2>
+<h3>Post a Job</h3>
+<ul>
+<li>Step 1: Choose poster type — Individual or Business</li>
+<li>Step 2: Select number of rooms (Kitchen, Living Room, Bedroom, Play Room, Toilet/Bathroom)</li>
+<li>Step 3: Upload room photos — AI analyses each one (dirtiness, clutter, hours, price, risk)</li>
+<li>Step 4: Price summary with platform fee, optional content insurance, and VAT (business only)</li>
+<li>Step 5: Contact details — business email enforced for business accounts</li>
+<li>Funds held in escrow, released 24 hours after job completion — no automatic release</li>
+</ul>
+<h3>AI Room Analysis</h3>
+<ul>
+<li>Images compressed to 768px max width, JPEG 0.65 quality before upload</li>
+<li>Uploaded to Supabase Storage, then sent to OpenAI Vision</li>
+<li>Returns: room type, cleanliness score, clutter score, estimated hours, risk level, suggested price, recommended cleaners</li>
+<li>Model: <code>gpt-4o-mini</code> by default (cheap, fast)</li>
+<li>Auto-switches to <code>gpt-4o</code> when declared content value exceeds £10,000</li>
+<li>Model badge shown on each analysis result</li>
+</ul>
+<h3>Service Provider Registration</h3>
+<ul>
+<li>Email OTP verification via Resend (6-digit code, 10-minute expiry)</li>
+<li>Business companies must use a business domain email (validated on both card selection and email field)</li>
+<li>Pre-agree to auto-accept 90% price tier at registration</li>
+<li>KYC required every 6 months — business email NOT required for KYC</li>
+</ul>
+<h3>Negotiation System (4-Price Tiers)</h3>
+<ul>
+<li>When a customer selects a cleaner, they enter rooms and upload photos</li>
+<li>AI determines the base price</li>
+<li>Customer offered 4 tiers: 100%, 95%, 90% (default), 80%</li>
+<li>Email sent to cleaner to accept</li>
+<li>If cleaner pre-agreed to 90% → auto-accepted instantly, customer proceeds to payment</li>
+</ul>
+<h3>UK VAT (Business Accounts)</h3>
+<ul>
+<li>Standard rate: 20%</li>
+<li>Applied to: service subtotal + platform fee</li>
+<li>VAT receipt issued on payment</li>
+<li>VAT number field (optional) collected at job posting</li>
+</ul>
+<h3>Content Insurance</h3>
+<ul>
+<li>Optional add-on when posting a job</li>
+<li>8% flat rate of declared content value</li>
+<li>Maximum cover: £4,000</li>
+<li>Premium capped at £320</li>
+</ul>
+<h3>Pricing Model</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Base hourly rate</td>
+<td>£20/hr</td>
+</tr>
+<tr>
+<td>Clean room (score 1–3)</td>
+<td>Minimum 2 hours</td>
+</tr>
+<tr>
+<td>Moderate dirt (score 4–6)</td>
+<td>+50% hours</td>
+</tr>
+<tr>
+<td>Heavy/Extreme dirt (score 7–10)</td>
+<td>Minimum 4 hours</td>
+</tr>
+<tr>
+<td>Platform fee (customer)</td>
+<td>5%</td>
+</tr>
+<tr>
+<td>Matching fee (cleaner payout)</td>
+<td>7.5%</td>
+</tr>
+<tr>
+<td>UK VAT (business accounts only)</td>
+<td>20%</td>
+</tr>
+</tbody>
+</table>
+<h3>Registration Fees (one-off, non-refundable)</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Fee</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Individual cleaner</td>
+<td>£99</td>
+</tr>
+<tr>
+<td>Cleaning company</td>
+<td>£179</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Navigation Structure</h2>
+<table>
+<thead>
+<tr>
+<th>Nav Item</th>
+<th>Destination</th>
+<th>Who uses it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Home</td>
+<td>/</td>
+<td>Everyone</td>
+</tr>
+<tr>
+<td>Dashboard</td>
+<td>/dashboard</td>
+<td>Admin</td>
+</tr>
+<tr>
+<td>Find Cleaners</td>
+<td>/cleaners</td>
+<td>Customers</td>
+</tr>
+<tr>
+<td>Post a Job</td>
+<td>/post-job</td>
+<td>Individual &amp; Business customers</td>
+</tr>
+<tr>
+<td>Service Provider</td>
+<td>/register-cleaner</td>
+<td>Individual cleaners &amp; companies</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Project Structure</h2>
+<pre><code>src/
+├── app/
+│   ├── api/
+│   │   ├── analyze-room/     # OpenAI Vision room analysis
+│   │   ├── send-otp/         # Resend email OTP (6-digit, 10min expiry)
+│   │   └── verify-otp/       # OTP verification
+│   ├── cleaners/
+│   │   ├── page.tsx          # Browse all cleaners
+│   │   └── [id]/page.tsx     # Cleaner profile + 4-price booking flow
+│   ├── dashboard/page.tsx    # Admin overview
+│   ├── jobs/[id]/page.tsx    # Job detail page
+│   ├── post-job/page.tsx     # Post a cleaning job (individual or business)
+│   ├── register-cleaner/     # Service Provider registration + OTP flow
+│   ├── register-individual/  # Landing: post job or register as cleaner
+│   ├── register-business/    # Landing: post job or register as company
+│   ├── privacy/              # Privacy policy
+│   ├── terms/                # Terms of service
+│   └── support/              # Support page
+├── components/
+│   ├── PostJobSection.tsx    # Full job posting form with AI pricing + VAT
+│   ├── RegisterBusinessSection.tsx
+│   ├── FeeStructure.tsx
+│   ├── HeroSection.tsx
+│   ├── HowItWorks.tsx
+│   ├── JobListings.tsx
+│   ├── Navbar.tsx            # Post a Job + Service Provider
+│   └── Footer.tsx
+├── context/
+│   └── CleanConnectContext.tsx  # Supabase CRUD (jobs, cleaners, businesses)
+└── lib/
+    ├── supabase.ts           # Supabase client
+    ├── analysisLimit.ts      # Daily free analysis limit (5/day)
+    ├── sampleCleaners.ts     # 7 placeholder cleaners (2 individual, 2 company, 3 service providers)
+    └── sampleJobs.ts         # Sample jobs for demo
+</code></pre>
+<hr />
+<h2>Placeholder Data</h2>
+<h3>Individual Cleaners</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>City</th>
+<th>Rate</th>
+<th>Auto-Accept 90%</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sarah Mitchell</td>
+<td>London (SE1)</td>
+<td>£20/hr</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>James Okafor</td>
+<td>London (E1)</td>
+<td>£25/hr</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<h3>Cleaning Companies</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>City</th>
+<th>Rate</th>
+<th>Auto-Accept 90%</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sparkle Pro Clean Ltd</td>
+<td>Manchester</td>
+<td>£30/hr</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Clean &amp; Shine Services Ltd</td>
+<td>London</td>
+<td>£28/hr</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<h3>Service Providers</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>City</th>
+<th>Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PrimeServ Facilities Ltd</td>
+<td>Business</td>
+<td>Birmingham</td>
+<td>£32/hr</td>
+</tr>
+<tr>
+<td>Priya Sharma</td>
+<td>Individual</td>
+<td>Birmingham</td>
+<td>£20/hr</td>
+</tr>
+<tr>
+<td>Tom Bradley</td>
+<td>Individual</td>
+<td>Leeds</td>
+<td>£20/hr</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>Database Schema (Supabase)</h2>
+<h3><code>jobs</code></h3>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>uuid</td>
+<td>Primary key</td>
+</tr>
+<tr>
+<td>rooms</td>
+<td>jsonb</td>
+<td>Room types and counts</td>
+</tr>
+<tr>
+<td>total_rooms</td>
+<td>int</td>
+<td>Total rooms</td>
+</tr>
+<tr>
+<td>subtotal</td>
+<td>numeric</td>
+<td>AI-calculated subtotal</td>
+</tr>
+<tr>
+<td>total</td>
+<td>numeric</td>
+<td>Total inc. platform fee, VAT, insurance</td>
+</tr>
+<tr>
+<td>email</td>
+<td>text</td>
+<td>Customer email</td>
+</tr>
+<tr>
+<td>phone</td>
+<td>text</td>
+<td>Customer phone</td>
+</tr>
+<tr>
+<td>postcode</td>
+<td>text</td>
+<td>Job postcode</td>
+</tr>
+<tr>
+<td>city</td>
+<td>text</td>
+<td>Job city</td>
+</tr>
+<tr>
+<td>status</td>
+<td>text</td>
+<td>awaiting / accepted / completed</td>
+</tr>
+<tr>
+<td>conditions</td>
+<td>jsonb</td>
+<td>Per-room condition map</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>timestamptz</td>
+<td>Timestamp</td>
+</tr>
+</tbody>
+</table>
+<h3><code>cleaners</code></h3>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>uuid</td>
+<td>Primary key</td>
+</tr>
+<tr>
+<td>name</td>
+<td>text</td>
+<td>Full name or company name</td>
+</tr>
+<tr>
+<td>email</td>
+<td>text</td>
+<td>Contact email (business domain for companies)</td>
+</tr>
+<tr>
+<td>phone</td>
+<td>text</td>
+<td>Contact phone</td>
+</tr>
+<tr>
+<td>postcode / city</td>
+<td>text</td>
+<td>Location</td>
+</tr>
+<tr>
+<td>bio</td>
+<td>text</td>
+<td>Description</td>
+</tr>
+<tr>
+<td>type</td>
+<td>text</td>
+<td>individual / company</td>
+</tr>
+<tr>
+<td>rate</td>
+<td>numeric</td>
+<td>Hourly rate (£)</td>
+</tr>
+<tr>
+<td>radius</td>
+<td>int</td>
+<td>Coverage radius (miles)</td>
+</tr>
+<tr>
+<td>company_number</td>
+<td>text</td>
+<td>Companies House number</td>
+</tr>
+<tr>
+<td>auto_accept_90</td>
+<td>boolean</td>
+<td>Pre-agreed 90% auto-accept</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>timestamptz</td>
+<td>Timestamp</td>
+</tr>
+</tbody>
+</table>
+<h3><code>businesses</code></h3>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>uuid</td>
+<td>Primary key</td>
+</tr>
+<tr>
+<td>company_name</td>
+<td>text</td>
+<td>Registered company name</td>
+</tr>
+<tr>
+<td>company_number</td>
+<td>text</td>
+<td>Companies House number</td>
+</tr>
+<tr>
+<td>vat_number</td>
+<td>text</td>
+<td>VAT number (optional)</td>
+</tr>
+<tr>
+<td>contact_name</td>
+<td>text</td>
+<td>Primary contact</td>
+</tr>
+<tr>
+<td>email / phone</td>
+<td>text</td>
+<td>Business contact details</td>
+</tr>
+<tr>
+<td>postcode / city</td>
+<td>text</td>
+<td>Location</td>
+</tr>
+<tr>
+<td>service_type</td>
+<td>text</td>
+<td>Type of cleaning needed</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>timestamptz</td>
+<td>Timestamp</td>
+</tr>
+</tbody>
+</table>
+<h3><code>analyses</code></h3>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>uuid</td>
+<td>Primary key</td>
+</tr>
+<tr>
+<td>job_id</td>
+<td>uuid</td>
+<td>FK → jobs</td>
+</tr>
+<tr>
+<td>room_key / room_index</td>
+<td>text / int</td>
+<td>Which room</td>
+</tr>
+<tr>
+<td>image_url</td>
+<td>text</td>
+<td>Supabase Storage public URL</td>
+</tr>
+<tr>
+<td>room_type</td>
+<td>text</td>
+<td>Detected room type</td>
+</tr>
+<tr>
+<td>cleanliness_score</td>
+<td>int</td>
+<td>1–10</td>
+</tr>
+<tr>
+<td>clutter_score</td>
+<td>int</td>
+<td>1–10</td>
+</tr>
+<tr>
+<td>estimated_cleaning_hours</td>
+<td>numeric</td>
+<td>AI estimate</td>
+</tr>
+<tr>
+<td>risk_level</td>
+<td>text</td>
+<td>Low / Moderate / High / Extreme</td>
+</tr>
+<tr>
+<td>suggested_price_gbp</td>
+<td>numeric</td>
+<td>AI price (£)</td>
+</tr>
+<tr>
+<td>recommended_cleaners</td>
+<td>int</td>
+<td>Suggested cleaner count</td>
+</tr>
+<tr>
+<td>reasoning</td>
+<td>text</td>
+<td>One-sentence AI summary</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>timestamptz</td>
+<td>Timestamp</td>
+</tr>
+</tbody>
+</table>
+<h3><code>otp_codes</code></h3>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>uuid</td>
+<td>Primary key</td>
+</tr>
+<tr>
+<td>email</td>
+<td>text</td>
+<td>Target email address</td>
+</tr>
+<tr>
+<td>code</td>
+<td>text</td>
+<td>6-digit code</td>
+</tr>
+<tr>
+<td>purpose</td>
+<td>text</td>
+<td>cleaner / customer</td>
+</tr>
+<tr>
+<td>verified</td>
+<td>boolean</td>
+<td>Whether code was used</td>
+</tr>
+<tr>
+<td>expires_at</td>
+<td>timestamptz</td>
+<td>10-minute expiry</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>timestamptz</td>
+<td>Timestamp</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>API Routes</h2>
+<h3><code>POST /api/analyze-room</code></h3>
+<p>Analyses a room image using OpenAI Vision and stores the result in Supabase.</p>
+<p><strong>Body:</strong></p>
+<pre><code class="language-json">{
+  &quot;imageBase64&quot;: &quot;...&quot;,
+  &quot;mediaType&quot;: &quot;image/jpeg&quot;,
+  &quot;roomKey&quot;: &quot;kitchen&quot;,
+  &quot;roomIndex&quot;: 0,
+  &quot;jobId&quot;: &quot;uuid (optional)&quot;,
+  &quot;useHighAccuracy&quot;: false
+}
+</code></pre>
+<p><strong>Response:</strong></p>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;analysis&quot;: {
+    &quot;room_type&quot;: &quot;Kitchen&quot;,
+    &quot;cleanliness_score&quot;: 7,
+    &quot;clutter_score&quot;: 5,
+    &quot;estimated_cleaning_hours&quot;: 4,
+    &quot;risk_level&quot;: &quot;High&quot;,
+    &quot;suggested_price_gbp&quot;: 80,
+    &quot;recommended_cleaners&quot;: 1,
+    &quot;reasoning&quot;: &quot;Kitchen has grease buildup and dirty dishes.&quot;
+  },
+  &quot;imageUrl&quot;: &quot;https://...&quot;
+}
+</code></pre>
+<p><strong>Model selection:</strong>
+- <code>useHighAccuracy: false</code> → <code>gpt-4o-mini</code> (default)
+- <code>useHighAccuracy: true</code> → <code>gpt-4o</code> (auto when content value &gt; £10,000)</p>
+<hr />
+<h3><code>POST /api/send-otp</code></h3>
+<p>Sends a 6-digit verification code via Resend.</p>
+<p><strong>Body:</strong> <code>{ "email": "user@example.com", "purpose": "cleaner" }</code></p>
+<hr />
+<h3><code>POST /api/verify-otp</code></h3>
+<p>Verifies a submitted OTP code.</p>
+<p><strong>Body:</strong> <code>{ "email": "user@example.com", "code": "123456" }</code></p>
+<hr />
+<h2>Environment Variables</h2>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Used in</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>OPENAI_API_KEY</code></td>
+<td>Server</td>
+<td>OpenAI Vision API</td>
+</tr>
+<tr>
+<td><code>NEXT_PUBLIC_SUPABASE_URL</code></td>
+<td>Client + Server</td>
+<td>Supabase project URL</td>
+</tr>
+<tr>
+<td><code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code></td>
+<td>Client + Server</td>
+<td>Supabase anon key</td>
+</tr>
+<tr>
+<td><code>RESEND_API_KEY</code></td>
+<td>Server</td>
+<td>Resend transactional email</td>
+</tr>
+</tbody>
+</table>
+<p>All set in <code>.env.local</code> (local dev) and Vercel project <code>ctscleaner</code> (production).</p>
+<hr />
+<h2>Local Setup</h2>
+<pre><code class="language-bash">git clone &lt;repo&gt;
+cd CleanConnect
+npm install
+
+# Create .env.local
+OPENAI_API_KEY=sk-proj-...
+NEXT_PUBLIC_SUPABASE_URL=https://xshemmkygkuaynyjbqrx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+RESEND_API_KEY=re_...
+
+# Run Supabase schema (SQL Editor)
+# paste supabase-schema.sql → run
+# paste supabase-add-otp.sql → run (if otp_codes table missing)
+
+npm run dev
+</code></pre>
+<hr />
+<h2>Deployment</h2>
+<pre><code class="language-bash">vercel --prod --scope olumide-s-projects1 --yes
+</code></pre>
+<p>Live at: <strong>https://ctscleaner.vercel.app</strong></p>
+<hr />
+<h2>Business Rules Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Detail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Individual cleaner fee</td>
+<td>£99 one-off, non-refundable</td>
+</tr>
+<tr>
+<td>Company cleaner fee</td>
+<td>£179 one-off, non-refundable</td>
+</tr>
+<tr>
+<td>KYC renewal</td>
+<td>Every 6 months</td>
+</tr>
+<tr>
+<td>Business email for KYC</td>
+<td>NOT required</td>
+</tr>
+<tr>
+<td>Business email to register as company</td>
+<td>Required</td>
+</tr>
+<tr>
+<td>Business email to post as business</td>
+<td>Required</td>
+</tr>
+<tr>
+<td>Escrow release</td>
+<td>24 hours after job completion</td>
+</tr>
+<tr>
+<td>Auto-release</td>
+<td>Never</td>
+</tr>
+<tr>
+<td>Negotiation tiers</td>
+<td>100%, 95%, 90% (default), 80%</td>
+</tr>
+<tr>
+<td>Auto-accept tier</td>
+<td>90% (if pre-agreed at registration)</td>
+</tr>
+<tr>
+<td>Content insurance</td>
+<td>8% of declared value, max £4,000</td>
+</tr>
+<tr>
+<td>AI model (standard)</td>
+<td>gpt-4o-mini</td>
+</tr>
+<tr>
+<td>AI model (content &gt; £10k)</td>
+<td>gpt-4o</td>
+</tr>
+<tr>
+<td>Image compression</td>
+<td>768px max, JPEG 0.65 quality</td>
+</tr>
+<tr>
+<td>UK VAT (business jobs)</td>
+<td>20% on service + platform fee</td>
+</tr>
+<tr>
+<td>Platform fee (customer)</td>
+<td>5%</td>
+</tr>
+<tr>
+<td>Matching fee (cleaner)</td>
+<td>7.5% of payout</td>
+</tr>
+</tbody>
+</table></body>
+</html>
