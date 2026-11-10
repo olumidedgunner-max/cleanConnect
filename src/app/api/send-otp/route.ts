@@ -4,6 +4,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// onboarding@resend.dev is Resend's shared sandbox sender — it only
+// delivers to your own Resend account address. Set RESEND_FROM to a
+// verified domain sender before real users sign up.
+const FROM = process.env.RESEND_FROM ?? "CleanConnect <onboarding@resend.dev>";
+
 function getSupabase() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -47,7 +52,7 @@ export async function POST(req: NextRequest) {
     const purposeLabel = purpose === "cleaner" ? "Cleaner Registration" : purpose === "customer" ? "Job Posting" : "Verification";
 
     const { error: emailError } = await resend.emails.send({
-      from: "CleanConnect <onboarding@resend.dev>",
+      from: FROM,
       to: email,
       subject: `Your CleanConnect verification code — ${code}`,
       html: `
