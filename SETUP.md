@@ -20,7 +20,12 @@ so the site still looks populated.
 | Vercel env vars | **Done** — injected automatically across production, preview, development |
 | Preview deploy | **Done** — built Ready in 30s |
 | End-to-end test | **Done** — 24/24 checks (see below) |
-| Production deploy | **Pending — needs you** (see next section) |
+| Production deploy | **Done** — live, 24/24 re-verified against the real site |
+| Supabase plan | ⚠️ **Free — needs upgrading to Pro ($25/mo)** |
+
+**Account details, logins and how to reach each service are in
+`credentials/ACCESS.md`.** That folder is gitignored, so it is on your
+machine only and never reaches GitHub.
 
 New project ref: `nmaiatqssemjqmkntmpr`. Billing runs through the Vercel
 account `olumidedgunner-3629`, scope `olumide-s-projects1` — no separate
@@ -44,17 +49,20 @@ bucket are empty.
 
 ---
 
-## The one step left: deploy production
+## The one step left: upgrade the database plan
 
-Production is still serving the 173-day-old build that points at the dead
-database. The deploy itself is blocked from automation, so run:
+The site is live and working. The remaining risk is the plan it runs on.
+
+Supabase was provisioned on the **Free** tier, which pauses after 7 days
+of inactivity and is deleted after a long enough idle period. That is
+precisely what destroyed the previous database. Upgrade to Pro ($25/mo):
 
 ```
-vercel --prod --yes
+https://vercel.com/olumide-s-projects1/~/stores/integration/store_zuE1TpYhixlQrNoJ
 ```
 
-Then the live site at https://ctscleaner.vercel.app picks up the new
-credentials. Nothing else is needed — the env vars are already in place.
+Until that is done, the site is one quiet week away from the same
+failure.
 
 ---
 
