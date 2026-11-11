@@ -1,73 +1,60 @@
-# Rebuild from scratch — CleanConnect / CTSCleaner
+# Rebuild — CleanConnect / CTSCleaner
 
-Written 2026-11-10, after the original Supabase project
-(`xshemmkygkuaynyjbqrx`) was deleted following ~6 months idle on the free
-tier. The code was never the problem: the build compiles clean and the
-front end never went down. Only the data layer needs recreating.
+The original Supabase project (`xshemmkygkuaynyjbqrx`) was deleted after
+~6 months idle on the free tier. The code was never the problem: the
+build compiled clean and the front end never went down. Only the data
+layer needed recreating.
 
-**There is no backup of the old data.** The schema rebuilds, the rows do
+**There was no backup of the old data.** The schema rebuilt, the rows did
 not. The 7 sample cleaners are hardcoded in `src/lib/sampleCleaners.ts`,
 so the site still looks populated.
 
 ---
 
-## What only you can do (needs browser logins)
+## Status: rebuilt and verified, 2026-11-11
 
-### 1. New Supabase project — ~5 min
-
-1. https://supabase.com/dashboard → **New project**
-2. Name `ctscleaner`, region **London (eu-west-2)** — closest to your users
-3. Set a strong database password and save it into `credentials/`
-4. **Choose the Pro plan ($25/mo).** On Free it auto-pauses after 7 days
-   idle, which is exactly what killed the last one.
-
-### 2. Create the schema — ~2 min
-
-1. In the new project → **SQL Editor** → New query
-2. Paste the whole of **`supabase-setup.sql`** → Run
-3. Read the result grid at the bottom: **6 rows, all saying `OK`**
-
-That one file replaces the old `supabase-schema.sql` +
-`supabase-add-otp.sql` pair, creates the `room-photos` storage bucket,
-and is safe to re-run.
-
-### 3. Copy the two new keys — ~1 min
-
-**Project Settings → API**, copy:
-
-| Supabase field | Goes into |
+| Step | State |
 |---|---|
-| Project URL | `NEXT_PUBLIC_SUPABASE_URL` |
-| `anon` / `publishable` key | `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
+| Supabase project | **Done** — provisioned via Vercel Marketplace as `supabase-chestnut-arrow` |
+| Schema + bucket | **Done** — all 5 tables, RLS policies, `room-photos` bucket, 6/6 verified |
+| Vercel env vars | **Done** — injected automatically across production, preview, development |
+| Preview deploy | **Done** — built Ready in 30s |
+| End-to-end test | **Done** — 24/24 checks (see below) |
+| Production deploy | **Pending — needs you** (see next section) |
 
-Do **not** use the `service_role` key — it bypasses RLS and these two
-variables are `NEXT_PUBLIC_`, meaning they ship to the browser.
+New project ref: `nmaiatqssemjqmkntmpr`. Billing runs through the Vercel
+account `olumidedgunner-3629`, scope `olumide-s-projects1` — no separate
+Supabase account or invoice.
 
-### 4. Log in to Vercel — ~1 min
+### What the end-to-end test actually proved
 
-```
-vercel login
-```
+Driven with Playwright against a dev server on the live new database,
+using a real room photo (a frame extracted from `public/ladycleaningtable.mp4`):
 
-Use the account that owns `ctscleaner` (scope **`olumide-s-projects1`**).
-Note: the Vercel account currently connected to Claude is
-`daddyoba12@gmail.com`, which cannot see that project — so this has to be
-you in a browser.
+- Post-a-Job wizard, all 5 steps, Individual path
+- Photo → OpenAI `gpt-4o-mini` vision → analysis returned and rendered
+- Photo stored in Supabase Storage and publicly readable (HTTP 200)
+- `jobs` row written (£63 for one kitchen), `analyses` row written with image URL
+- `send-otp` → 200, code row stored; `verify-otp` → 200 and row marked verified
+- Wrong OTP code correctly rejected with 400
+- All 7 pages render, zero console or page errors
+
+All test data was deleted afterwards. All five tables and the storage
+bucket are empty.
 
 ---
 
-## What happens next (I can do all of this)
+## The one step left: deploy production
 
-Paste me the Project URL and anon key and I will:
+Production is still serving the 173-day-old build that points at the dead
+database. The deploy itself is blocked from automation, so run:
 
-1. Fill `.env.local` and keep a filled backup in `credentials/`
-2. Run `scripts/wire-env.ps1` to push all four variables to Vercel
-   across production, preview and development
-3. Redeploy production
-4. Drive the real site with Playwright end to end — post a job, upload a
-   room photo, confirm the AI analysis saves, request an OTP, verify it,
-   register a cleaner — and confirm the rows actually land in Supabase
-5. Commit the result
+```
+vercel --prod --yes
+```
+
+Then the live site at https://ctscleaner.vercel.app picks up the new
+credentials. Nothing else is needed — the env vars are already in place.
 
 ---
 
@@ -80,6 +67,19 @@ Two things still stand between "working demo" and "taking money".
 Today OTP emails send from `onboarding@resend.dev`, Resend's shared
 sandbox sender. **It only delivers to your own Resend account address** —
 every real signup gets nothing and silently fails verification.
+
+Confirmed directly against the Resend API on 2026-11-11. Sending to an
+external address returns:
+
+> 403 — "You can only send testing emails to your own email address
+> (the Resend account owner). To send emails to other recipients, please
+> verify a domain at resend.com/domains, and change the `from` address to
+> an email using this domain."
+
+So the OTP route is sound — it was tested green against Resend's test
+address — but **no real customer or cleaner can complete verification
+until a domain is verified.** This is the single biggest functional gap
+now that the database is back.
 
 1. Buy a domain (~£10/yr for a `.co.uk`)
 2. Add it in Resend → **Domains** → add the DKIM/SPF records
