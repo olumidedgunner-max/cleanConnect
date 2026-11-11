@@ -59,6 +59,16 @@ type Ctx = {
 
 const CleanConnectContext = createContext<Ctx | null>(null);
 
+// Columns the public anon key is allowed to read. Keep these in step with
+// the grants in supabase-setup.sql (section 2b) — email and phone are
+// deliberately absent from all three.
+const JOB_COLUMNS =
+  "id,rooms,total_rooms,subtotal,total,postcode,city,status,conditions,created_at";
+const CLEANER_COLUMNS =
+  "id,name,postcode,city,bio,type,rate,radius,company_number,auto_accept_90,created_at";
+const BUSINESS_COLUMNS =
+  "id,company_name,company_number,vat_number,contact_name,postcode,city,service_type,created_at";
+
 function rowToJob(r: Record<string, unknown>): Job {
   return {
     id: r.id as string,
@@ -66,8 +76,8 @@ function rowToJob(r: Record<string, unknown>): Job {
     totalRooms: r.total_rooms as number,
     subtotal: r.subtotal as number,
     total: r.total as number,
-    email: r.email as string,
-    phone: r.phone as string,
+    email: (r.email as string) ?? "",
+    phone: (r.phone as string) ?? "",
     postcode: r.postcode as string,
     city: r.city as string,
     status: r.status as Job["status"],
@@ -80,8 +90,8 @@ function rowToCleaner(r: Record<string, unknown>): Cleaner {
   return {
     id: r.id as string,
     name: r.name as string,
-    email: r.email as string,
-    phone: r.phone as string,
+    email: (r.email as string) ?? "",
+    phone: (r.phone as string) ?? "",
     postcode: r.postcode as string,
     city: r.city as string,
     bio: (r.bio as string) || "",
@@ -101,8 +111,8 @@ function rowToBusiness(r: Record<string, unknown>): Business {
     companyNumber: r.company_number as string,
     vatNumber: (r.vat_number as string) || "",
     contactName: r.contact_name as string,
-    email: r.email as string,
-    phone: r.phone as string,
+    email: (r.email as string) ?? "",
+    phone: (r.phone as string) ?? "",
     postcode: r.postcode as string,
     city: r.city as string,
     serviceType: (r.service_type as string) || "",
@@ -119,9 +129,14 @@ export function CleanConnectProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function load() {
       const [{ data: j }, { data: c }, { data: b }] = await Promise.all([
-        supabase.from("jobs").select("*").order("created_at", { ascending: false }),
-        supabase.from("cleaners").select("*").order("created_at", { ascending: false }),
-        supabase.from("businesses").select("*").order("created_at", { ascending: false }),
+        // Explicit column lists, not select("*"): the anon key is public
+        // and is no longer granted select on the email/phone columns, so
+        // asking for them would fail. Nothing in the UI renders them —
+        // any admin view that needs them must go through server code
+        // using the service_role key.
+        supabase.from("jobs").select(JOB_COLUMNS).order("created_at", { ascending: false }),
+        supabase.from("cleaners").select(CLEANER_COLUMNS).order("created_at", { ascending: false }),
+        supabase.from("businesses").select(BUSINESS_COLUMNS).order("created_at", { ascending: false }),
       ]);
       if (j) setJobs(j.map((r) => rowToJob(r as Record<string, unknown>)));
       if (c) setCleaners(c.map((r) => rowToCleaner(r as Record<string, unknown>)));
@@ -142,7 +157,7 @@ export function CleanConnectProvider({ children }: { children: ReactNode }) {
       postcode: j.postcode,
       city: j.city,
       conditions: j.conditions,
-    }).select().single();
+    }).select(JOB_COLUMNS).single();
     if (!error && data) setJobs((prev) => [rowToJob(data as Record<string, unknown>), ...prev]);
   }
 
@@ -159,7 +174,7 @@ export function CleanConnectProvider({ children }: { children: ReactNode }) {
       radius: c.radius,
       company_number: c.companyNumber,
       auto_accept_90: c.autoAccept90,
-    }).select().single();
+    }).select(CLEANER_COLUMNS).single();
     if (!error && data) setCleaners((prev) => [rowToCleaner(data as Record<string, unknown>), ...prev]);
   }
 
@@ -174,7 +189,7 @@ export function CleanConnectProvider({ children }: { children: ReactNode }) {
       postcode: b.postcode,
       city: b.city,
       service_type: b.serviceType,
-    }).select().single();
+    }).select(BUSINESS_COLUMNS).single();
     if (!error && data) setBusinesses((prev) => [rowToBusiness(data as Record<string, unknown>), ...prev]);
   }
 

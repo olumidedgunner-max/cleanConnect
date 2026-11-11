@@ -9,11 +9,17 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // verified domain sender before real users sign up.
 const FROM = process.env.RESEND_FROM ?? "CleanConnect <onboarding@resend.dev>";
 
+// Server-only client. otp_codes grants the anon key no access at all —
+// otherwise anyone could read a verification code out of the browser and
+// complete signup as someone else. service_role bypasses RLS and must
+// never be exposed to the client.
 function getSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const key =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_SECRET_KEY;
+  if (!key) throw new Error("SUPABASE_SERVICE_ROLE_KEY is not configured");
+  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, key, {
+    auth: { persistSession: false },
+  });
 }
 
 function generateOTP() {
@@ -85,6 +91,11 @@ export async function POST(req: NextRequest) {
     });
 
     if (emailError) {
+      // Don't leave an unusable code behind — it would block the next
+      // send for this address (which deletes only unverified rows) and
+      // sit in the table until it expired.
+      await supabase.from("otp_codes").delete().eq("email", email).eq("code", code);
+      console.error("Resend send failed:", emailError);
       return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
     }
 

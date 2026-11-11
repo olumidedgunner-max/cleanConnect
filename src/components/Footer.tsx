@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CONTACT_EMAIL } from "@/lib/contact";
 
 export default function Footer() {
   return (
@@ -41,7 +42,7 @@ export default function Footer() {
           <div>
             <div style={{ color: "white", fontWeight: 700, marginBottom: "16px", fontSize: "14px", textTransform: "uppercase", letterSpacing: "1px" }}>Support</div>
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              <a href="mailto:olumidedgunner@gmail.com" style={{ color: "#90a3b6", textDecoration: "none", fontSize: "14px" }}>Contact Us</a>
+              <a href={`mailto:${CONTACT_EMAIL}`} style={{ color: "#90a3b6", textDecoration: "none", fontSize: "14px" }}>Contact Us</a>
               <Link href="/support" style={{ color: "#90a3b6", textDecoration: "none", fontSize: "14px" }}>Help Centre</Link>
             </div>
           </div>
@@ -49,8 +50,8 @@ export default function Footer() {
 
         <div style={{ borderTop: "1px solid rgba(255,255,255,.06)", paddingTop: "28px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
           <p style={{ fontSize: "13px" }}>© 2026 CleanConnect · Privacy First · AI Assisted · Escrow Protected</p>
-          <a href="mailto:olumidedgunner@gmail.com" style={{ color: "#57c7ff", textDecoration: "none", fontSize: "13px", fontWeight: 700 }}>
-            olumidedgunner@gmail.com
+          <a href={`mailto:${CONTACT_EMAIL}`} style={{ color: "#57c7ff", textDecoration: "none", fontSize: "13px", fontWeight: 700 }}>
+            {CONTACT_EMAIL}
           </a>
         </div>
       </div>

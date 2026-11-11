@@ -97,10 +97,15 @@ create index if not exists otp_codes_email_code_idx
 -- ------------------------------------------------------------
 -- 2. Row Level Security
 -- ------------------------------------------------------------
--- NOTE: these policies are deliberately open, because the app has no
--- user authentication yet — the browser talks to Supabase with the
--- anon key. Anyone who reads the public JS bundle can read the jobs,
--- cleaners and businesses tables. Lock this down when auth is added.
+-- The browser talks to Supabase with the anon key, which is public —
+-- it ships inside the JS bundle. So anything anon can read, the whole
+-- internet can read. Two layers are used here:
+--
+--   a) row policies below, which allow public read/insert of listings
+--   b) column grants in section 2b, which withhold the PII columns
+--      (email, phone) from anon entirely
+--
+-- otp_codes gets NO anon policies at all — see section 2c.
 
 alter table jobs       enable row level security;
 alter table cleaners   enable row level security;
@@ -128,16 +133,49 @@ drop policy if exists "public insert analyses" on analyses;
 create policy "public read analyses"   on analyses for select using (true);
 create policy "public insert analyses" on analyses for insert with check (true);
 
--- OTP needs all four verbs: insert (new code), select (verify),
--- update (mark verified), delete (clear previous unused codes).
+-- ------------------------------------------------------------
+-- 2b. Column grants — withhold PII from the public anon key
+-- ------------------------------------------------------------
+-- Row policies are row-level only; they cannot hide a column. Without
+-- these grants, anyone with the anon key (i.e. anyone) could read every
+-- customer's email address and phone number straight out of the browser.
+--
+-- The app never renders these columns — they are write-only in practice
+-- (collected by a form, read back only by server code). Any admin screen
+-- that genuinely needs them must use the service_role key server-side.
+
+revoke select on jobs       from anon;
+revoke select on cleaners   from anon;
+revoke select on businesses from anon;
+
+grant select (id, rooms, total_rooms, subtotal, total, postcode, city,
+              status, conditions, created_at)
+  on jobs to anon;
+
+grant select (id, name, postcode, city, bio, type, rate, radius,
+              company_number, auto_accept_90, created_at)
+  on cleaners to anon;
+
+grant select (id, company_name, company_number, vat_number, contact_name,
+              postcode, city, service_type, created_at)
+  on businesses to anon;
+
+
+-- ------------------------------------------------------------
+-- 2c. otp_codes — no public access whatsoever
+-- ------------------------------------------------------------
+-- Previously this table allowed public select, which meant anyone could
+-- read any verification code for any email address and complete signup
+-- as that person. RLS is on with no anon policies, so anon gets nothing.
+-- /api/send-otp and /api/verify-otp run server-side and use the
+-- service_role key, which bypasses RLS.
+
 drop policy if exists "public insert otp" on otp_codes;
 drop policy if exists "public read otp"   on otp_codes;
 drop policy if exists "public update otp" on otp_codes;
 drop policy if exists "public delete otp" on otp_codes;
-create policy "public insert otp" on otp_codes for insert with check (true);
-create policy "public read otp"   on otp_codes for select using (true);
-create policy "public update otp" on otp_codes for update using (true);
-create policy "public delete otp" on otp_codes for delete using (true);
+
+revoke all on otp_codes from anon;
 
 
 -- ------------------------------------------------------------

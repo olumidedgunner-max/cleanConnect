@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CONTACT_EMAIL } from "@/lib/contact";
 
 export const metadata = { title: "Terms of Service — CleanConnect" };
 
@@ -23,7 +24,7 @@ export default function TermsPage() {
           { title: "Disputes", body: "Disputes must be raised within 48 hours of job completion. CleanConnect will review evidence and make a final decision within 5 working days. Our decision is final." },
           { title: "Prohibited Use", body: "Users must not post false information, manipulate reviews, attempt to bypass escrow, or engage in any fraudulent activity. Violations will result in permanent account suspension." },
           { title: "Limitation of Liability", body: "CleanConnect is not liable for damage to property during a cleaning job. We recommend both parties document the condition of the property with photos before and after the service." },
-          { title: "Contact", body: "For legal queries, email olumidedgunner@gmail.com." },
+          { title: "Contact", body: `For legal queries, email ${CONTACT_EMAIL}.` },
         ].map((s) => (
           <div key={s.title} style={{ marginBottom: "32px" }}>
             <h2 style={{ fontSize: "20px", fontWeight: 800, marginBottom: "12px", color: "#57c7ff" }}>{s.title}</h2>

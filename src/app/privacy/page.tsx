@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CONTACT_EMAIL } from "@/lib/contact";
 
 export const metadata = { title: "Privacy Policy — CleanConnect" };
 
@@ -19,9 +20,9 @@ export default function PrivacyPage() {
           { title: "How We Use Your Data", body: "Your contact details are used to match you with local cleaners or jobs. Location data (postcode/city) is used for proximity matching only. We never sell your data to third parties." },
           { title: "Photo & Media Storage", body: "Room photos uploaded for AI pricing are stored securely and attached only to the verified booking. They are not shared publicly and are deleted after the dispute window closes." },
           { title: "Identity Reveal", body: "Full names and addresses for both clients and cleaners are only revealed to each other after escrow has been funded. This protects both parties until commitment is confirmed." },
-          { title: "UK GDPR", body: "CleanConnect complies with UK GDPR. You have the right to access, correct, or request deletion of your personal data at any time. Contact us at olumidedgunner@gmail.com." },
+          { title: "UK GDPR", body: `CleanConnect complies with UK GDPR. You have the right to access, correct, or request deletion of your personal data at any time. Contact us at ${CONTACT_EMAIL}.` },
           { title: "Cookies", body: "We use essential cookies only to maintain your session. No tracking or advertising cookies are used." },
-          { title: "Contact", body: "For privacy concerns, email olumidedgunner@gmail.com." },
+          { title: "Contact", body: `For privacy concerns, email ${CONTACT_EMAIL}.` },
         ].map((s) => (
           <div key={s.title} style={{ marginBottom: "32px" }}>
             <h2 style={{ fontSize: "20px", fontWeight: 800, marginBottom: "12px", color: "#57c7ff" }}>{s.title}</h2>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CONTACT_EMAIL } from "@/lib/contact";
 
 export const metadata = { title: "Support — CleanConnect" };
 
@@ -19,8 +20,8 @@ export default function SupportPage() {
           <div style={{ fontSize: "36px", marginBottom: "12px" }}>✉️</div>
           <h2 style={{ fontSize: "24px", fontWeight: 900, marginBottom: "8px" }}>Email Support</h2>
           <p style={{ color: "rgba(255,255,255,.8)", marginBottom: "20px" }}>We aim to reply within 24 hours.</p>
-          <a href="mailto:olumidedgunner@gmail.com" style={{ display: "inline-block", padding: "14px 32px", borderRadius: "12px", background: "white", color: "#0077ff", textDecoration: "none", fontWeight: 800, fontSize: "16px" }}>
-            olumidedgunner@gmail.com
+          <a href={`mailto:${CONTACT_EMAIL}`} style={{ display: "inline-block", padding: "14px 32px", borderRadius: "12px", background: "white", color: "#0077ff", textDecoration: "none", fontWeight: 800, fontSize: "16px" }}>
+            {CONTACT_EMAIL}
           </a>
         </div>
 
