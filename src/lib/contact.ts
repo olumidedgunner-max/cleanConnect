@@ -6,4 +6,4 @@
 //
 // Override per environment with NEXT_PUBLIC_CONTACT_EMAIL if needed.
 export const CONTACT_EMAIL =
-  process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "info@cleanconnect.com";
+  process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "info@cleanersmarketplace.co.uk";
