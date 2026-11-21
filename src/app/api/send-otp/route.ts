@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
           <body style="margin:0;padding:0;background:#07111f;font-family:'Segoe UI',Arial,sans-serif;">
             <div style="max-width:520px;margin:40px auto;background:linear-gradient(180deg,#0d1727,#101d30);border-radius:20px;border:1px solid rgba(255,255,255,.08);overflow:hidden;">
               <div style="background:linear-gradient(135deg,#1ea7ff,#0077ff);padding:28px 36px;">
-                <h1 style="margin:0;color:white;font-size:24px;font-weight:900;">Clean<span style="color:#bde8ff;">Connect</span></h1>
+                <h1 style="margin:0;color:white;font-size:24px;font-weight:900;">Cleaners<span style="color:#bde8ff;">Marketplace</span></h1>
                 <p style="margin:6px 0 0;color:rgba(255,255,255,.8);font-size:14px;">${purposeLabel}</p>
               </div>
               <div style="padding:36px;">

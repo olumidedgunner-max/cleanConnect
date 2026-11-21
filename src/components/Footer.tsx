@@ -9,8 +9,8 @@ export default function Footer() {
 
           {/* Brand */}
           <div>
-            <Link href="/" style={{ fontSize: "28px", fontWeight: 800, marginBottom: "16px", color: "white", textDecoration: "none", display: "block" }}>
-              Clean<span style={{ color: "#57c7ff" }}>Connect</span>
+            <Link href="/" style={{ fontSize: "21px", fontWeight: 800, marginBottom: "16px", color: "white", textDecoration: "none", display: "block" }}>
+              Cleaners<span style={{ color: "#57c7ff" }}>Marketplace</span>
             </Link>
             <p style={{ lineHeight: 1.7, fontSize: "14px", maxWidth: "280px" }}>
               AI-powered cleaning marketplace. Every job verified, priced fairly, and protected by escrow.

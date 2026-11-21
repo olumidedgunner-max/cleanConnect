@@ -3,8 +3,8 @@ import Link from "next/link";
 export default function Navbar() {
   return (
     <nav style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "15px 0" }}>
-      <Link href="/" style={{ fontSize: "34px", fontWeight: 800, letterSpacing: "-1px", textDecoration: "none", color: "white" }}>
-        Clean<span style={{ color: "#57c7ff" }}>Connect</span>
+      <Link href="/" style={{ fontSize: "24px", fontWeight: 800, letterSpacing: "-1px", textDecoration: "none", color: "white" }}>
+        Cleaners<span style={{ color: "#57c7ff" }}>Marketplace</span>
       </Link>
       <ul style={{ display: "flex", gap: "20px", listStyle: "none", alignItems: "center" }}>
         <li><Link href="/" style={{ color: "white", textDecoration: "none", opacity: 0.85, fontSize: "15px" }}>Home</Link></li>
