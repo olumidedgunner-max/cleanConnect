@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { CONTACT_EMAIL } from "@/lib/contact";
 
-export const metadata = { title: "Support — CleanConnect" };
+export const metadata = { title: "Support — CleanersMarketplace" };
 
 export default function SupportPage() {
   return (
@@ -31,7 +31,7 @@ export default function SupportPage() {
           { q: "How does escrow work?", a: "When a cleaner accepts your job, you pay via Stripe. The money is held securely — not paid to the cleaner yet. After the job is done and you approve, funds are released automatically." },
           { q: "What if I'm unhappy with the clean?", a: "Raise a dispute within 48 hours of approval. The cleaner's before/after photos will be reviewed alongside any evidence you provide. Our team makes a final decision within 5 working days." },
           { q: "How do cleaners get paid?", a: "After you approve the job, payment is released from escrow via Stripe within 24 hours. A 7.5% matching fee is deducted from the cleaner's payout." },
-          { q: "Can a business use CleanConnect?", a: "Yes. Register a business account via 'Register Business' in the nav. Businesses pay a 15% platform fee. Full Stripe registration is required before your first job goes live." },
+          { q: "Can a business use CleanersMarketplace?", a: "Yes. Register a business account via 'Register Business' in the nav. Businesses pay a 15% platform fee. Full Stripe registration is required before your first job goes live." },
         ].map((faq) => (
           <div key={faq.q} style={{ background: "linear-gradient(180deg,#0d1727,#101d30)", borderRadius: "18px", padding: "24px", marginBottom: "16px", border: "1px solid rgba(255,255,255,.06)" }}>
             <h3 style={{ fontWeight: 800, fontSize: "17px", marginBottom: "10px" }}>{faq.q}</h3>

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { useCleanConnect } from "@/context/CleanConnectContext";
+import { useMarketplace } from "@/context/MarketplaceContext";
 import { getRemainingAnalyses, hasReachedLimit, incrementUsage, MAX_FREE } from "@/lib/analysisLimit";
 
 const ROOM_TYPES = [
@@ -65,7 +65,7 @@ const inputStyle = { width: "100%", padding: "14px 18px", borderRadius: "12px", 
 const labelStyle = { display: "block" as const, color: "#9fb0c1", fontSize: "13px", fontWeight: 700, marginBottom: "8px", textTransform: "uppercase" as const, letterSpacing: "1px" };
 
 export default function PostJobSection() {
-  const { addJob } = useCleanConnect();
+  const { addJob } = useMarketplace();
   const [posterType, setPosterType] = useState<"individual" | "business" | null>(null);
   const [counts, setCounts] = useState<Record<string, number>>({ kitchen: 0, living: 0, bedroom: 0, playroom: 0, toilet: 0 });
   const [rooms, setRooms] = useState<Rooms>({});

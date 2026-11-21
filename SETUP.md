@@ -1,4 +1,4 @@
-# Rebuild — CleanConnect / CTSCleaner
+# Rebuild — CleanersMarketplace / CTSCleaner
 
 The original Supabase project (`xshemmkygkuaynyjbqrx`) was deleted after
 ~6 months idle on the free tier. The code was never the problem: the
@@ -91,7 +91,7 @@ now that the database is back.
 
 1. Buy a domain (~£10/yr for a `.co.uk`)
 2. Add it in Resend → **Domains** → add the DKIM/SPF records
-3. Set `RESEND_FROM=CleanConnect <noreply@yourdomain.co.uk>`
+3. Set `RESEND_FROM=CleanersMarketplace <noreply@yourdomain.co.uk>`
 
 The code already reads `RESEND_FROM` (`src/app/api/send-otp/route.ts`),
 so this is an env change, not a code change.

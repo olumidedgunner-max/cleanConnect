@@ -1,6 +1,6 @@
 "use client";
-import { CleanConnectProvider } from "@/context/CleanConnectContext";
+import { MarketplaceProvider } from "@/context/MarketplaceContext";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
-  return <CleanConnectProvider>{children}</CleanConnectProvider>;
+  return <MarketplaceProvider>{children}</MarketplaceProvider>;
 }

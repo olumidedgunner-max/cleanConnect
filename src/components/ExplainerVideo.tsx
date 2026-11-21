@@ -70,7 +70,7 @@ export default function ExplainerVideo() {
   return (
     <section style={{ padding: "90px 30px", background: "#0a1420" }}>
       <div style={{ maxWidth: "1100px", margin: "auto" }}>
-        <h2 style={{ fontSize: "46px", fontWeight: 900, marginBottom: "12px" }}>How CleanConnect Works</h2>
+        <h2 style={{ fontSize: "46px", fontWeight: 900, marginBottom: "12px" }}>How CleanersMarketplace Works</h2>
         <p style={{ color: "#9fb0c1", fontSize: "18px", marginBottom: "50px", maxWidth: "600px", lineHeight: 1.7 }}>
           From room photo to clean home and paid cleaner — four steps, fully verified, every penny protected.
         </p>

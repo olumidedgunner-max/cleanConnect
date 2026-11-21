@@ -1,4 +1,4 @@
-const CACHE = "cleanconnect-v1";
+const CACHE = "cleanersmarketplace-v1";
 const STATIC = [
   "/",
   "/post-job",

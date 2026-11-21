@@ -1,12 +1,12 @@
 "use client";
 import { useState } from "react";
-import { useCleanConnect } from "@/context/CleanConnectContext";
+import { useMarketplace } from "@/context/MarketplaceContext";
 
 const inputStyle = { width: "100%", padding: "14px 18px", borderRadius: "12px", border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "white", fontSize: "16px", outline: "none" };
 const labelStyle = { display: "block" as const, color: "#9fb0c1", fontSize: "13px", fontWeight: 700, marginBottom: "8px", textTransform: "uppercase" as const, letterSpacing: "1px" };
 
 export default function RegisterCleanerSection() {
-  const { addCleaner, cleaners } = useCleanConnect();
+  const { addCleaner, cleaners } = useMarketplace();
   const [form, setForm] = useState({ name: "", email: "", phone: "", postcode: "", city: "", bio: "" });
   const [submitted, setSubmitted] = useState(false);
 

@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { useCleanConnect } from "@/context/CleanConnectContext";
+import { useMarketplace } from "@/context/MarketplaceContext";
 
 const inputStyle = { width: "100%", padding: "14px 18px", borderRadius: "12px", border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "white", fontSize: "16px", outline: "none" };
 const labelStyle = { display: "block" as const, color: "#9fb0c1", fontSize: "13px", fontWeight: 700, marginBottom: "8px", textTransform: "uppercase" as const, letterSpacing: "1px" };
@@ -16,7 +16,7 @@ function isBusinessEmail(email: string) {
 }
 
 export default function RegisterCleanerPage() {
-  const { addCleaner } = useCleanConnect();
+  const { addCleaner } = useMarketplace();
   const [type, setType] = useState<"individual" | "company" | null>(null);
   const [form, setForm] = useState({ name: "", email: "", phone: "", postcode: "", city: "", bio: "", companyName: "", companyNumber: "", rate: "30" });
   const [autoAccept90, setAutoAccept90] = useState(true);
@@ -268,7 +268,7 @@ export default function RegisterCleanerPage() {
             <div style={{ fontSize: "60px", marginBottom: "16px" }}>✓</div>
             <h3 style={{ fontSize: "26px", fontWeight: 900, marginBottom: "10px" }}>Email Verified — You&apos;re Registered!</h3>
             <p style={{ color: "#9fb0c1", lineHeight: 1.7, maxWidth: "500px", margin: "0 auto 28px" }}>
-              Welcome to CleanConnect. You will receive email notifications for jobs in your area. KYC verification is required every 6 months — we will email you when due. Your details are only released to clients once KYC is complete.
+              Welcome to CleanersMarketplace. You will receive email notifications for jobs in your area. KYC verification is required every 6 months — we will email you when due. Your details are only released to clients once KYC is complete.
             </p>
             <Link href="/" style={{ display: "inline-block", padding: "14px 32px", borderRadius: "14px", background: "linear-gradient(135deg,#1ea7ff,#0077ff)", color: "white", textDecoration: "none", fontWeight: 700 }}>
               Browse Available Jobs

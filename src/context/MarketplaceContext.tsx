@@ -57,7 +57,7 @@ type Ctx = {
   loading: boolean;
 };
 
-const CleanConnectContext = createContext<Ctx | null>(null);
+const MarketplaceContext = createContext<Ctx | null>(null);
 
 // Columns the public anon key is allowed to read. Keep these in step with
 // the grants in supabase-setup.sql (section 2b) — email and phone are
@@ -120,7 +120,7 @@ function rowToBusiness(r: Record<string, unknown>): Business {
   };
 }
 
-export function CleanConnectProvider({ children }: { children: ReactNode }) {
+export function MarketplaceProvider({ children }: { children: ReactNode }) {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [cleaners, setCleaners] = useState<Cleaner[]>([]);
   const [businesses, setBusinesses] = useState<Business[]>([]);
@@ -194,14 +194,14 @@ export function CleanConnectProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <CleanConnectContext.Provider value={{ jobs, addJob, cleaners, addCleaner, businesses, addBusiness, loading }}>
+    <MarketplaceContext.Provider value={{ jobs, addJob, cleaners, addCleaner, businesses, addBusiness, loading }}>
       {children}
-    </CleanConnectContext.Provider>
+    </MarketplaceContext.Provider>
   );
 }
 
-export function useCleanConnect() {
-  const ctx = useContext(CleanConnectContext);
-  if (!ctx) throw new Error("useCleanConnect must be used inside CleanConnectProvider");
+export function useMarketplace() {
+  const ctx = useContext(MarketplaceContext);
+  if (!ctx) throw new Error("useMarketplace must be used inside MarketplaceProvider");
   return ctx;
 }

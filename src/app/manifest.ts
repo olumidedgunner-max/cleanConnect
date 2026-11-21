@@ -2,9 +2,9 @@ import { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "CleanConnect — AI Cleaning Marketplace",
-    short_name: "CleanConnect",
-    description: "AI-powered cleaning marketplace. Post a job, get a fair price, pay securely via escrow.",
+    name: "CleanersMarketplace — Find Work. Find Cleaners. Connect.",
+    short_name: "CleanersMarketplace",
+    description: "Connecting cleaning professionals with people and businesses that need cleaning services. Post a job and get a fair price from your room photos in seconds.",
     start_url: "/",
     display: "standalone",
     orientation: "portrait-primary",

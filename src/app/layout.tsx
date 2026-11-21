@@ -17,12 +17,12 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: { default: "CleanConnect — Cleaning Quotes in Seconds from a Photo", template: "%s | CleanConnect" },
-  description: "Post a cleaning job, get a fair price from your room photos in seconds, pay securely via escrow. Great for students and individuals to earn money cleaning.",
+  title: { default: "CleanersMarketplace — Find Work. Find Cleaners. Connect.", template: "%s | CleanersMarketplace" },
+  description: "Connecting cleaning professionals with people and businesses that need cleaning services. Post a job and get a fair price from your room photos in seconds.",
   keywords: ["cleaning", "cleaner", "marketplace", "AI pricing", "escrow", "domestic cleaning", "UK"],
-  authors: [{ name: "CleanConnect" }],
-  creator: "CleanConnect",
-  applicationName: "CleanConnect",
+  authors: [{ name: "CleanersMarketplace" }],
+  creator: "CleanersMarketplace",
+  applicationName: "CleanersMarketplace",
   generator: "Next.js",
   referrer: "origin-when-cross-origin",
   metadataBase: new URL("https://cleanersmarketplace.co.uk"),
@@ -30,15 +30,15 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_GB",
     url: "https://cleanersmarketplace.co.uk",
-    siteName: "CleanConnect",
-    title: "CleanConnect — Cleaning Quotes in Seconds from a Photo",
-    description: "Post a cleaning job, AI prices it from photos, pay securely via escrow.",
-    images: [{ url: "/icons/icon-512.png", width: 512, height: 512, alt: "CleanConnect" }],
+    siteName: "CleanersMarketplace",
+    title: "CleanersMarketplace — Find Work. Find Cleaners. Connect.",
+    description: "Connecting cleaning professionals with people and businesses that need cleaning services. Post a job and get a fair price from your room photos in seconds.",
+    images: [{ url: "/icons/icon-512.png", width: 512, height: 512, alt: "CleanersMarketplace" }],
   },
   twitter: {
     card: "summary",
-    title: "CleanConnect — Cleaning Quotes in Seconds from a Photo",
-    description: "Post a cleaning job, AI prices it from photos, pay securely via escrow.",
+    title: "CleanersMarketplace — Find Work. Find Cleaners. Connect.",
+    description: "Connecting cleaning professionals with people and businesses that need cleaning services. Post a job and get a fair price from your room photos in seconds.",
     images: ["/icons/icon-512.png"],
   },
   icons: {
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "CleanConnect",
+    title: "CleanersMarketplace",
     startupImage: "/icons/icon-512.png",
   },
   formatDetection: { telephone: false },

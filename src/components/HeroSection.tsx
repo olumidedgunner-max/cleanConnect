@@ -18,15 +18,16 @@ export default function HeroSection() {
         <Navbar />
         <div style={{ maxWidth: "650px", marginTop: "100px" }}>
           <div style={{ display: "inline-block", padding: "8px 16px", background: "rgba(30,167,255,.15)", border: "1px solid rgba(30,167,255,.3)", borderRadius: "999px", color: "#57c7ff", fontSize: "13px", fontWeight: 700, marginBottom: "24px" }}>
-            AI pricing, human cleaners
+            YOUR CLEAN CONNECTIONS
           </div>
           <h1 style={{ fontSize: "70px", lineHeight: 1.0, marginBottom: "25px", fontWeight: 900 }}>
-            Get Your Home Cleaned. Fast. Verified. Secure.
+            Find Work. Find Cleaners. Connect.
           </h1>
           <p style={{ fontSize: "20px", lineHeight: 1.6, color: "#c5d0dc", marginBottom: "35px" }}>
-            Tell us your rooms, upload photos, and our AI prices your job instantly.
-            Students and individuals earn money cleaning. Businesses post at scale.
-            Every job protected by escrow.
+            Connecting cleaning professionals with people and businesses that need
+            cleaning services. Tell us your rooms, upload photos, and our AI prices
+            your job instantly. Students and individuals earn money cleaning;
+            businesses post at scale.
           </p>
           <div style={{ display: "flex", gap: "18px", flexWrap: "wrap" }}>
             <Link href="/post-job" style={{ padding: "16px 28px", borderRadius: "14px", border: "none", fontSize: "16px", fontWeight: 700, cursor: "pointer", background: "linear-gradient(135deg,#1ea7ff,#0077ff)", color: "white", textDecoration: "none" }}>

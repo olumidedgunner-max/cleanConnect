@@ -2,7 +2,7 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
-import { useCleanConnect } from "@/context/CleanConnectContext";
+import { useMarketplace } from "@/context/MarketplaceContext";
 import { SAMPLE_JOBS } from "@/lib/sampleJobs";
 
 const inputStyle = { width: "100%", padding: "14px 18px", borderRadius: "12px", border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "white", fontSize: "16px", outline: "none" };
@@ -18,7 +18,7 @@ function getRate(c: string) { return c === "none" ? 30 : c === "moderate" ? 20 :
 
 export default function JobDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { jobs } = useCleanConnect();
+  const { jobs } = useMarketplace();
   const [form, setForm] = useState({ name: "", email: "", phone: "", postcode: "", city: "" });
   const [step, setStep] = useState<"view" | "accepting" | "confirmed">("view");
 

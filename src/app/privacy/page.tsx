@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { CONTACT_EMAIL } from "@/lib/contact";
 
-export const metadata = { title: "Privacy Policy — CleanConnect" };
+export const metadata = { title: "Privacy Policy — CleanersMarketplace" };
 
 export default function PrivacyPage() {
   return (
@@ -16,11 +16,11 @@ export default function PrivacyPage() {
         <h1 style={{ fontSize: "42px", fontWeight: 900, marginBottom: "12px" }}>Privacy Policy</h1>
         <p style={{ color: "#9fb0c1", marginBottom: "40px" }}>Last updated: May 2026</p>
         {[
-          { title: "What We Collect", body: "We collect your name, email address, phone number, postcode and city when you register or post a job. Full address and payment details are collected only via Stripe at the point of escrow activation — never stored by CleanConnect directly." },
+          { title: "What We Collect", body: "We collect your name, email address, phone number, postcode and city when you register or post a job. Full address and payment details are collected only via Stripe at the point of escrow activation — never stored by CleanersMarketplace directly." },
           { title: "How We Use Your Data", body: "Your contact details are used to match you with local cleaners or jobs. Location data (postcode/city) is used for proximity matching only. We never sell your data to third parties." },
           { title: "Photo & Media Storage", body: "Room photos uploaded for AI pricing are stored securely and attached only to the verified booking. They are not shared publicly and are deleted after the dispute window closes." },
           { title: "Identity Reveal", body: "Full names and addresses for both clients and cleaners are only revealed to each other after escrow has been funded. This protects both parties until commitment is confirmed." },
-          { title: "UK GDPR", body: `CleanConnect complies with UK GDPR. You have the right to access, correct, or request deletion of your personal data at any time. Contact us at ${CONTACT_EMAIL}.` },
+          { title: "UK GDPR", body: `CleanersMarketplace complies with UK GDPR. You have the right to access, correct, or request deletion of your personal data at any time. Contact us at ${CONTACT_EMAIL}.` },
           { title: "Cookies", body: "We use essential cookies only to maintain your session. No tracking or advertising cookies are used." },
           { title: "Contact", body: `For privacy concerns, email ${CONTACT_EMAIL}.` },
         ].map((s) => (

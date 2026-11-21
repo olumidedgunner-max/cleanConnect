@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useCleanConnect } from "@/context/CleanConnectContext";
+import { useMarketplace } from "@/context/MarketplaceContext";
 import { SAMPLE_JOBS } from "@/lib/sampleJobs";
 
 function StatusBadge({ status }: { status: string }) {
@@ -18,7 +18,7 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export default function DashboardPage() {
-  const { jobs, cleaners, businesses } = useCleanConnect();
+  const { jobs, cleaners, businesses } = useMarketplace();
 
   const allJobs = [
     ...jobs.map((j) => ({
@@ -64,7 +64,7 @@ export default function DashboardPage() {
 
       <div style={{ maxWidth: "1100px", margin: "auto", padding: "50px 30px" }}>
         <h1 style={{ fontSize: "42px", fontWeight: 900, marginBottom: "10px" }}>Dashboard</h1>
-        <p style={{ color: "#9fb0c1", fontSize: "16px", marginBottom: "50px" }}>Overview of all jobs, cleaners, and businesses on CleanConnect.</p>
+        <p style={{ color: "#9fb0c1", fontSize: "16px", marginBottom: "50px" }}>Overview of all jobs, cleaners, and businesses on CleanersMarketplace.</p>
 
         {/* Stats row */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px", marginBottom: "50px" }}>

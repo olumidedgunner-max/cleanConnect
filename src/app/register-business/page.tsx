@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export const metadata = { title: "Register as Business — CleanConnect" };
+export const metadata = { title: "Register as Business — CleanersMarketplace" };
 
 export default function RegisterBusinessPage() {
   return (

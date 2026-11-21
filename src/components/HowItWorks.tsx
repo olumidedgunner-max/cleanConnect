@@ -34,7 +34,7 @@ const steps = [
 export default function HowItWorks() {
   return (
     <section style={{ padding: "90px 30px", maxWidth: "1100px", margin: "auto" }}>
-      <h2 style={{ fontSize: "46px", fontWeight: 900, marginBottom: "15px" }}>The Full CleanConnect Flow</h2>
+      <h2 style={{ fontSize: "46px", fontWeight: 900, marginBottom: "15px" }}>The Full CleanersMarketplace Flow</h2>
       <p style={{ color: "#9fb0c1", fontSize: "18px", lineHeight: 1.7, marginBottom: "55px", maxWidth: "700px" }}>
         Every step verified. Every penny protected. From photo upload to payment — fully automated.
       </p>

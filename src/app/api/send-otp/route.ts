@@ -7,7 +7,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // onboarding@resend.dev is Resend's shared sandbox sender — it only
 // delivers to your own Resend account address. Set RESEND_FROM to a
 // verified domain sender before real users sign up.
-const FROM = process.env.RESEND_FROM ?? "CleanConnect <onboarding@resend.dev>";
+const FROM = process.env.RESEND_FROM ?? "CleanersMarketplace <onboarding@resend.dev>";
 
 // Server-only client. otp_codes grants the anon key no access at all —
 // otherwise anyone could read a verification code out of the browser and
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     const { error: emailError } = await resend.emails.send({
       from: FROM,
       to: email,
-      subject: `Your CleanConnect verification code — ${code}`,
+      subject: `Your CleanersMarketplace verification code — ${code}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
                 </p>
               </div>
               <div style="padding:20px 36px;border-top:1px solid rgba(255,255,255,.06);">
-                <p style="margin:0;color:#9fb0c1;font-size:12px;">© 2026 CleanConnect · Secure marketplace for cleaning services</p>
+                <p style="margin:0;color:#9fb0c1;font-size:12px;">© 2026 CleanersMarketplace · Secure marketplace for cleaning services</p>
               </div>
             </div>
           </body>

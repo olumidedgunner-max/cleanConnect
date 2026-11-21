@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { CONTACT_EMAIL } from "@/lib/contact";
 
-export const metadata = { title: "Terms of Service — CleanConnect" };
+export const metadata = { title: "Terms of Service — CleanersMarketplace" };
 
 export default function TermsPage() {
   return (
@@ -16,14 +16,14 @@ export default function TermsPage() {
         <h1 style={{ fontSize: "42px", fontWeight: 900, marginBottom: "12px" }}>Terms of Service</h1>
         <p style={{ color: "#9fb0c1", marginBottom: "40px" }}>Last updated: May 2026</p>
         {[
-          { title: "Platform Role", body: "CleanConnect is a marketplace that connects clients with cleaners. We are not a cleaning company. We do not employ cleaners. All jobs are agreed directly between clients and cleaners." },
+          { title: "Platform Role", body: "CleanersMarketplace is a marketplace that connects clients with cleaners. We are not a cleaning company. We do not employ cleaners. All jobs are agreed directly between clients and cleaners." },
           { title: "Platform Fees", body: "Clients (individuals) pay a 5% platform fee on each job. Businesses pay 15%. Cleaners pay a 7.5% matching fee deducted from their payout. All fees are shown before any commitment is made." },
-          { title: "Escrow Payments", body: "All payments are processed via Stripe and held in escrow. Funds are only released after the client confirms job completion or after the dispute window closes. CleanConnect does not hold funds directly." },
+          { title: "Escrow Payments", body: "All payments are processed via Stripe and held in escrow. Funds are only released after the client confirms job completion or after the dispute window closes. CleanersMarketplace does not hold funds directly." },
           { title: "Identity Verification", body: "Both clients and cleaners must complete identity verification via Stripe before a job proceeds. Full addresses are only exchanged after escrow is funded." },
           { title: "Photo Evidence", body: "Cleaners are required to upload before and after photos for every job. This evidence is used in any dispute resolution process." },
-          { title: "Disputes", body: "Disputes must be raised within 48 hours of job completion. CleanConnect will review evidence and make a final decision within 5 working days. Our decision is final." },
+          { title: "Disputes", body: "Disputes must be raised within 48 hours of job completion. CleanersMarketplace will review evidence and make a final decision within 5 working days. Our decision is final." },
           { title: "Prohibited Use", body: "Users must not post false information, manipulate reviews, attempt to bypass escrow, or engage in any fraudulent activity. Violations will result in permanent account suspension." },
-          { title: "Limitation of Liability", body: "CleanConnect is not liable for damage to property during a cleaning job. We recommend both parties document the condition of the property with photos before and after the service." },
+          { title: "Limitation of Liability", body: "CleanersMarketplace is not liable for damage to property during a cleaning job. We recommend both parties document the condition of the property with photos before and after the service." },
           { title: "Contact", body: `For legal queries, email ${CONTACT_EMAIL}.` },
         ].map((s) => (
           <div key={s.title} style={{ marginBottom: "32px" }}>

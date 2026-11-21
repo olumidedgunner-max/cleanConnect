@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { useCleanConnect } from "@/context/CleanConnectContext";
+import { useMarketplace } from "@/context/MarketplaceContext";
 import { SAMPLE_CLEANERS, SampleCleaner } from "@/lib/sampleCleaners";
-import { Cleaner } from "@/context/CleanConnectContext";
+import { Cleaner } from "@/context/MarketplaceContext";
 
 type DisplayCleaner = {
   id: string;
@@ -74,7 +74,7 @@ function CleanerCard({ c }: { c: DisplayCleaner }) {
 }
 
 export default function CleanersPage() {
-  const { cleaners } = useCleanConnect();
+  const { cleaners } = useMarketplace();
   const [cityFilter, setCityFilter] = useState("");
 
   const liveCleaners: DisplayCleaner[] = cleaners.map((c: Cleaner) => ({

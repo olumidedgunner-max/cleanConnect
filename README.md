@@ -1,4 +1,4 @@
-# CTSCleaner (CleanConnect)
+# CleanersMarketplace (deployed as ctscleaner)
 
 A marketplace platform connecting customers with individual cleaners and cleaning companies. AI-powered room analysis determines fair pricing, with built-in negotiation, escrow payments, KYC verification, and email OTP validation.
 
@@ -144,7 +144,7 @@ src/
 │   ├── Navbar.tsx            # Post a Job + Service Provider
 │   └── Footer.tsx
 ├── context/
-│   └── CleanConnectContext.tsx  # Supabase CRUD (jobs, cleaners, businesses)
+│   └── MarketplaceContext.tsx     # Supabase CRUD (jobs, cleaners, businesses)
 └── lib/
     ├── supabase.ts           # Supabase client
     ├── analysisLimit.ts      # Daily free analysis limit (5/day)

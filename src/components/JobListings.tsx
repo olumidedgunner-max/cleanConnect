@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useCleanConnect } from "@/context/CleanConnectContext";
+import { useMarketplace } from "@/context/MarketplaceContext";
 
 const SAMPLE_JOBS = [
   { id: "s1", title: "3-Bed House Clean", detail: "3 bedrooms · 1 kitchen · 1 living room · 2 toilets", condition: "AI: Moderate dirt", conditionColor: "#f59e0b", badge: "Awaiting Cleaner", badgeColor: "#f59e0b", price: "£140", duration: "7 hours", city: "London", postcode: "SE1 7PB", verified: true },
@@ -9,7 +9,7 @@ const SAMPLE_JOBS = [
 ];
 
 export default function JobListings() {
-  const { jobs } = useCleanConnect();
+  const { jobs } = useMarketplace();
 
   const liveJobs = jobs.map((j) => ({
     id: j.id,

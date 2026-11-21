@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useCleanConnect } from "@/context/CleanConnectContext";
+import { useMarketplace } from "@/context/MarketplaceContext";
 
 const inputStyle = { width: "100%", padding: "14px 18px", borderRadius: "12px", border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.05)", color: "white", fontSize: "16px", outline: "none" };
 const labelStyle = { display: "block" as const, color: "#9fb0c1", fontSize: "13px", fontWeight: 700, marginBottom: "8px", textTransform: "uppercase" as const, letterSpacing: "1px" };
@@ -8,7 +8,7 @@ const labelStyle = { display: "block" as const, color: "#9fb0c1", fontSize: "13p
 const SERVICE_TYPES = ["Office Cleaning", "Retail & Commercial", "Airbnb / Short Let", "Property Management", "Hotel & Hospitality", "Construction Aftercare", "Other"];
 
 export default function RegisterBusinessSection() {
-  const { addBusiness, businesses } = useCleanConnect();
+  const { addBusiness, businesses } = useMarketplace();
   const [form, setForm] = useState({ companyName: "", companyNumber: "", vatNumber: "", contactName: "", email: "", phone: "", postcode: "", city: "", serviceType: "" });
   const [submitted, setSubmitted] = useState(false);
 

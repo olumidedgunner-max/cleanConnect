@@ -49,7 +49,7 @@ export default function Footer() {
         </div>
 
         <div style={{ borderTop: "1px solid rgba(255,255,255,.06)", paddingTop: "28px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
-          <p style={{ fontSize: "13px" }}>© 2026 CleanConnect · Privacy First · AI Assisted · Escrow Protected</p>
+          <p style={{ fontSize: "13px" }}>© 2026 CleanersMarketplace · Privacy First · AI Assisted · Escrow Protected</p>
           <a href={`mailto:${CONTACT_EMAIL}`} style={{ color: "#57c7ff", textDecoration: "none", fontSize: "13px", fontWeight: 700 }}>
             {CONTACT_EMAIL}
           </a>

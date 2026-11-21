@@ -1,7 +1,7 @@
 import PostJobSection from "@/components/PostJobSection";
 import Link from "next/link";
 
-export const metadata = { title: "Post a Clean Job — CleanConnect" };
+export const metadata = { title: "Post a Clean Job — CleanersMarketplace" };
 
 export default function PostJobPage() {
   return (

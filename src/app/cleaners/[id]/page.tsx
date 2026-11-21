@@ -2,7 +2,7 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useState, useRef } from "react";
-import { useCleanConnect } from "@/context/CleanConnectContext";
+import { useMarketplace } from "@/context/MarketplaceContext";
 import { SAMPLE_CLEANERS } from "@/lib/sampleCleaners";
 
 const ROOM_TYPES = [
@@ -32,7 +32,7 @@ const labelStyle = { display: "block" as const, color: "#9fb0c1", fontSize: "13p
 
 export default function CleanerProfilePage() {
   const { id } = useParams<{ id: string }>();
-  const { cleaners } = useCleanConnect();
+  const { cleaners } = useMarketplace();
 
   const liveMatch = cleaners.find((c) => c.id === id);
   const sampleMatch = SAMPLE_CLEANERS.find((c) => c.id === id);
