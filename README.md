@@ -326,7 +326,7 @@ All set in `.env.local` (local dev) and Vercel project `ctscleaner` (production)
 
 ```bash
 git clone <repo>
-cd CleanConnect
+cd CleanersMarketplace
 npm install
 
 # Create .env.local
