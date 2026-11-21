@@ -1,4 +1,4 @@
-const CACHE = "cleanersmarketplace-v1";
+const CACHE = "cleanersmarketplace-v2";
 const STATIC = [
   "/",
   "/post-job",
@@ -44,6 +44,32 @@ self.addEventListener("fetch", (e) => {
     return;
   }
 
+  const isPageView =
+    request.mode === "navigate" ||
+    (request.headers.get("accept") || "").includes("text/html");
+
+  // Pages are network-first. Cache-first served a stale shell on every
+  // return visit, so copy changes — branding, prices, legal terms —
+  // stayed invisible to anyone who had been here before, which is the
+  // wrong default for text we are legally on the hook for. Cache is
+  // still the offline fallback.
+  if (isPageView) {
+    e.respondWith(
+      fetch(request)
+        .then((res) => {
+          if (res.ok) {
+            const clone = res.clone();
+            caches.open(CACHE).then((c) => c.put(request, clone));
+          }
+          return res;
+        })
+        .catch(() => caches.match(request).then((cached) => cached || caches.match("/")))
+    );
+    return;
+  }
+
+  // Static assets keep cache-first: they are content-hashed, so a stale
+  // hit is the same bytes.
   e.respondWith(
     caches.match(request).then((cached) => {
       const network = fetch(request).then((res) => {
@@ -53,7 +79,6 @@ self.addEventListener("fetch", (e) => {
         }
         return res;
       });
-      // Return cached immediately, update in background (stale-while-revalidate)
       return cached || network;
     })
   );
