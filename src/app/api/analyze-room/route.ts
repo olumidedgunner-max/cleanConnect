@@ -114,8 +114,16 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, analysis, imageUrl });
   } catch (error) {
+    // The raw provider message is logged but never returned: it can name
+    // the billing console, quota state and account URLs, and this error
+    // is rendered straight into the page the customer is looking at.
     console.error("Room analysis error:", error);
-    const msg = error instanceof Error ? error.message : "Analysis failed";
-    return NextResponse.json({ error: msg }, { status: 500 });
+
+    const raw = error instanceof Error ? error.message : String(error);
+    const safe = /quota|credit|billing|rate limit|429/i.test(raw)
+      ? "Photo pricing is temporarily unavailable. Please try again shortly, or continue without a photo for a heavy-clean quote."
+      : "We could not price this photo. Please try another photo, or continue without one.";
+
+    return NextResponse.json({ error: safe }, { status: 500 });
   }
 }
