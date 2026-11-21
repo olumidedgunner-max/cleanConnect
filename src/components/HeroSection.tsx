@@ -45,7 +45,7 @@ export default function HeroSection() {
               { stat: "£0", label: "Free to post a job" },
             ].map((s) => (
               <div key={s.stat} style={{ background: "rgba(255,255,255,.06)", padding: "25px", borderRadius: "22px", backdropFilter: "blur(14px)", border: "1px solid rgba(255,255,255,.08)" }}>
-                <div style={{ fontSize: "32px", fontWeight: 900, color: "#57c7ff", marginBottom: "8px" }}>{s.stat}</div>
+                <div style={{ fontSize: "32px", fontWeight: 900, color: "#57c7ff", marginBottom: "8px", whiteSpace: "nowrap" }}>{s.stat}</div>
                 <div style={{ color: "#9fb0c1", fontSize: "14px" }}>{s.label}</div>
               </div>
             ))}
