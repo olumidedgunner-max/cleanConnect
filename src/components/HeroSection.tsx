@@ -18,7 +18,7 @@ export default function HeroSection() {
         <Navbar />
         <div style={{ maxWidth: "650px", marginTop: "100px" }}>
           <div style={{ display: "inline-block", padding: "8px 16px", background: "rgba(30,167,255,.15)", border: "1px solid rgba(30,167,255,.3)", borderRadius: "999px", color: "#57c7ff", fontSize: "13px", fontWeight: 700, marginBottom: "24px" }}>
-            AI-Powered Cleaning Marketplace
+            AI pricing, human cleaners
           </div>
           <h1 style={{ fontSize: "70px", lineHeight: 1.0, marginBottom: "25px", fontWeight: 900 }}>
             Get Your Home Cleaned. Fast. Verified. Secure.
@@ -38,10 +38,10 @@ export default function HeroSection() {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "20px", marginTop: "70px" }}>
             {[
-              { stat: "4.9★", label: "Average cleaner rating" },
-              { stat: "100%", label: "AI-verified room photos" },
-              { stat: "£2M+", label: "Secured via escrow" },
-              { stat: "24/7", label: "Dispute monitoring" },
+              { stat: "Seconds", label: "From photo to price" },
+              { stat: "5/day", label: "Free AI room analyses" },
+              { stat: "1–10", label: "Dirtiness score from photos" },
+              { stat: "£0", label: "Free to post a job" },
             ].map((s) => (
               <div key={s.stat} style={{ background: "rgba(255,255,255,.06)", padding: "25px", borderRadius: "22px", backdropFilter: "blur(14px)", border: "1px solid rgba(255,255,255,.08)" }}>
                 <div style={{ fontSize: "32px", fontWeight: 900, color: "#57c7ff", marginBottom: "8px" }}>{s.stat}</div>

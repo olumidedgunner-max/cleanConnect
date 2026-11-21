@@ -17,27 +17,27 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: { default: "CleanConnect — AI Cleaning Marketplace", template: "%s | CleanConnect" },
-  description: "AI-powered cleaning marketplace. Post a job, get a fair price from photos, pay securely via escrow. Great for students and individuals to earn money cleaning.",
+  title: { default: "CleanConnect — Cleaning Quotes in Seconds from a Photo", template: "%s | CleanConnect" },
+  description: "Post a cleaning job, get a fair price from your room photos in seconds, pay securely via escrow. Great for students and individuals to earn money cleaning.",
   keywords: ["cleaning", "cleaner", "marketplace", "AI pricing", "escrow", "domestic cleaning", "UK"],
   authors: [{ name: "CleanConnect" }],
   creator: "CleanConnect",
   applicationName: "CleanConnect",
   generator: "Next.js",
   referrer: "origin-when-cross-origin",
-  metadataBase: new URL("https://cleanconnect-two.vercel.app"),
+  metadataBase: new URL("https://cleanersmarketplace.co.uk"),
   openGraph: {
     type: "website",
     locale: "en_GB",
-    url: "https://cleanconnect-two.vercel.app",
+    url: "https://cleanersmarketplace.co.uk",
     siteName: "CleanConnect",
-    title: "CleanConnect — AI Cleaning Marketplace",
+    title: "CleanConnect — Cleaning Quotes in Seconds from a Photo",
     description: "Post a cleaning job, AI prices it from photos, pay securely via escrow.",
     images: [{ url: "/icons/icon-512.png", width: 512, height: 512, alt: "CleanConnect" }],
   },
   twitter: {
     card: "summary",
-    title: "CleanConnect — AI Cleaning Marketplace",
+    title: "CleanConnect — Cleaning Quotes in Seconds from a Photo",
     description: "Post a cleaning job, AI prices it from photos, pay securely via escrow.",
     images: ["/icons/icon-512.png"],
   },
