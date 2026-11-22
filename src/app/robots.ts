@@ -8,9 +8,11 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        // /dashboard is per-visitor and /api returns JSON, so neither
-        // belongs in an index.
-        disallow: ["/api/", "/dashboard"],
+        // None of these belong in search results: /api returns JSON,
+        // /dashboard and /admin are behind the admin login. Keeping the
+        // sign-in page out of the index also keeps it off the radar of
+        // the bots that trawl for login forms to guess at.
+        disallow: ["/api/", "/dashboard", "/admin"],
       },
     ],
     sitemap: `${SITE}/sitemap.xml`,
