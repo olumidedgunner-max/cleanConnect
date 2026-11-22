@@ -10,7 +10,7 @@ import { ADMIN_COOKIE, verifySessionToken } from "@/lib/adminAuth";
  * from the navbar.
  */
 const PROTECTED = ["/dashboard", "/admin"];
-const PUBLIC_ADMIN = ["/admin/login"];
+const PUBLIC_ADMIN = ["/admin/login", "/admin/reset"];
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;

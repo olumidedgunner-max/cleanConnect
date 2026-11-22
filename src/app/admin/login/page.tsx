@@ -119,6 +119,12 @@ function AdminLoginForm() {
             {error}
           </p>
         )}
+
+        <p style={{ marginTop: "20px", textAlign: "center" }}>
+          <a href="/admin/reset" style={{ color: "#57c7ff", fontSize: "14px", textDecoration: "none" }}>
+            Forgot password?
+          </a>
+        </p>
       </form>
     </main>
   );
