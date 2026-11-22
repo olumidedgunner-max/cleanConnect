@@ -49,7 +49,7 @@ export type Business = {
 
 type Ctx = {
   jobs: Job[];
-  addJob: (j: Omit<Job, "id" | "status" | "postedAt">) => Promise<void>;
+  addJob: (j: Omit<Job, "id" | "status" | "postedAt">) => Promise<Job | null>;
   cleaners: Cleaner[];
   addCleaner: (c: Omit<Cleaner, "id" | "registeredAt">) => Promise<void>;
   businesses: Business[];
@@ -146,7 +146,10 @@ export function MarketplaceProvider({ children }: { children: ReactNode }) {
     load();
   }, []);
 
-  async function addJob(j: Omit<Job, "id" | "status" | "postedAt">) {
+  // Returns the created job so callers can pay against its id. It used
+  // to return nothing, which is why the booking flow had no job to
+  // attach a payment to.
+  async function addJob(j: Omit<Job, "id" | "status" | "postedAt">): Promise<Job | null> {
     const { data, error } = await supabase.from("jobs").insert({
       rooms: j.rooms,
       total_rooms: j.totalRooms,
@@ -158,7 +161,10 @@ export function MarketplaceProvider({ children }: { children: ReactNode }) {
       city: j.city,
       conditions: j.conditions,
     }).select(JOB_COLUMNS).single();
-    if (!error && data) setJobs((prev) => [rowToJob(data as Record<string, unknown>), ...prev]);
+    if (error || !data) return null;
+    const job = rowToJob(data as Record<string, unknown>);
+    setJobs((prev) => [job, ...prev]);
+    return job;
   }
 
   async function addCleaner(c: Omit<Cleaner, "id" | "registeredAt">) {

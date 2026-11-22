@@ -23,6 +23,8 @@ export default function JobDetailPage() {
   const { jobs } = useMarketplace();
   const [form, setForm] = useState({ name: "", email: "", phone: "", postcode: "", city: "" });
   const [step, setStep] = useState<"view" | "accepting" | "confirmed">("view");
+  const [accepting, setAccepting] = useState(false);
+  const [acceptError, setAcceptError] = useState<string | null>(null);
 
   function set(k: string, v: string) { setForm((f) => ({ ...f, [k]: v })); }
 
@@ -207,12 +209,36 @@ export default function JobDetailPage() {
                 Cancel
               </button>
               <button
-                onClick={() => { if (form.name && form.email && form.phone && form.postcode && form.city) setStep("confirmed"); }}
+                onClick={async () => {
+                  if (!form.name || !form.email || !form.phone || !form.postcode || !form.city || accepting) return;
+                  setAccepting(true);
+                  setAcceptError(null);
+                  try {
+                    const res = await fetch("/api/jobs/accept", {
+                      method: "POST",
+                      headers: { "content-type": "application/json" },
+                      body: JSON.stringify({ jobId: id, cleaner: form }),
+                    });
+                    const data = await res.json();
+                    if (!res.ok) {
+                      setAcceptError(data.error ?? "Could not accept the job.");
+                      setAccepting(false);
+                      return;
+                    }
+                    setStep("confirmed");
+                  } catch {
+                    setAcceptError("Could not reach the server.");
+                  }
+                  setAccepting(false);
+                }}
                 style={{ flex: 2, padding: "16px", borderRadius: "14px", border: "none", background: "linear-gradient(135deg,#22c55e,#16a34a)", color: "white", fontSize: "16px", fontWeight: 800, cursor: "pointer" }}
               >
-                Confirm & Accept Job
+                {accepting ? "Accepting…" : "Confirm & Accept Job"}
               </button>
             </div>
+            {acceptError && (
+              <p style={{ color: "#f87171", fontSize: "14px", marginTop: "14px" }}>{acceptError}</p>
+            )}
           </div>
         )}
 

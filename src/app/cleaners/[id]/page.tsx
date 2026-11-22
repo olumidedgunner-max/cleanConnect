@@ -3,6 +3,8 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useState, useRef } from "react";
 import { useMarketplace } from "@/context/MarketplaceContext";
+import type { Job } from "@/context/MarketplaceContext";
+import PayButton from "@/components/PayButton";
 import { SAMPLE_CLEANERS } from "@/lib/sampleCleaners";
 
 const ROOM_TYPES = [
@@ -32,7 +34,7 @@ const labelStyle = { display: "block" as const, color: "#9fb0c1", fontSize: "13p
 
 export default function CleanerProfilePage() {
   const { id } = useParams<{ id: string }>();
-  const { cleaners } = useMarketplace();
+  const { cleaners, addJob } = useMarketplace();
 
   const liveMatch = cleaners.find((c) => c.id === id);
   const sampleMatch = SAMPLE_CLEANERS.find((c) => c.id === id);
@@ -58,6 +60,9 @@ export default function CleanerProfilePage() {
   const [message, setMessage] = useState("");
   const [sent, setSent] = useState(false);
   const [autoAccepted, setAutoAccepted] = useState(false);
+  const [jobId, setJobId] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
 
   if (!cleaner) {
     return (
@@ -166,11 +171,52 @@ export default function CleanerProfilePage() {
     }
   }
 
-  function handleSend() {
-    if (!name || !email || !phone || !postcode || !city) return;
+  async function handleSend() {
+    if (!name || !email || !phone || !postcode || !city || sending) return;
+    setSending(true);
+    setSendError(null);
+
+    // Create the job first: without a row there is no id to pay
+    // against, which is why booking used to dead-end here.
+    const job = await addJob({
+      rooms: Object.values(
+        allRows.reduce<Record<string, { type: string; count: number }>>((acc, { label }) => {
+          acc[label] = { type: label, count: (acc[label]?.count ?? 0) + 1 };
+          return acc;
+        }, {})
+      ) as Job["rooms"],
+      totalRooms: allRows.length,
+      subtotal: chosenPrice,
+      total: clientPays,
+      email,
+      phone,
+      postcode,
+      city,
+      conditions: { note: message, cleanerId: String(cleaner?.id ?? "") },
+    });
+
+    if (!job) {
+      setSendError("Could not save your booking. Please try again.");
+      setSending(false);
+      return;
+    }
+
+    setJobId(String(job.id));
+
+    // Tell the cleaner. The page claimed this happened long before
+    // anything actually sent it.
+    if (cleaner?.id) {
+      await fetch("/api/jobs/offer", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ jobId: job.id, cleanerId: cleaner.id, amount: clientPays }),
+      }).catch(() => null);
+    }
+
     const isAutoAccept = !!(cleaner && cleaner.autoAccept90 && TIERS && TIERS[selectedTierIdx].pct === 90);
     setAutoAccepted(isAutoAccept);
     setSent(true);
+    setSending(false);
   }
 
   return (
@@ -358,9 +404,19 @@ export default function CleanerProfilePage() {
                 </h3>
                 <p style={{ color: "#9fb0c1", lineHeight: 1.8, marginBottom: "24px", maxWidth: "440px", margin: "0 auto 24px" }}>
                   {autoAccepted
-                    ? `${cleaner.name} has pre-agreed to the 90% tier. Your offer of £${clientPays.toFixed(2)} is confirmed — you can now proceed to payment. Funds are held in escrow and released 24 hours after job completion.`
-                    : `An email has been sent to ${cleaner.name} with your offer of £${clientPays.toFixed(2)}. Once accepted, you will be guided through secure payment. Funds held in escrow — released 24 hours after completion.`}
+                    ? `${cleaner.name} has pre-agreed to the 90% tier, so your offer of £${clientPays.toFixed(2)} is confirmed. Payment is held until you approve the finished job.`
+                    : `We have emailed ${cleaner.name} your offer of £${clientPays.toFixed(2)}. Once it is accepted you can pay, and the money is held until you approve the finished job.`}
                 </p>
+
+                {jobId && autoAccepted && (
+                  <div style={{ maxWidth: "440px", margin: "0 auto 24px" }}>
+                    <PayButton jobId={jobId} amount={clientPays} />
+                  </div>
+                )}
+
+                {sendError && (
+                  <p style={{ color: "#f87171", fontSize: "14px", marginBottom: "16px" }}>{sendError}</p>
+                )}
                 <div style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" }}>
                   <Link href="/cleaners" style={{ padding: "14px 28px", borderRadius: "12px", background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", color: "white", textDecoration: "none", fontWeight: 700 }}>Browse More Cleaners</Link>
                   {autoAccepted && (
