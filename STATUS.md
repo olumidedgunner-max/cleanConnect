@@ -47,9 +47,28 @@ Each of these was tested against production, not assumed.
 - **Indexing prerequisites** — `robots.txt` and `sitemap.xml` are live
   (both were 404 before) and carry the real domain.
 
+## Read this first
+
+**`supabase-stripe.sql` has not been run.** The booking and acceptance
+code now expects `jobs.cleaner_id`, `jobs.payment_status` and
+`cleaners.stripe_account_id`, and none of those columns exist yet, so
+accepting a job will fail. Paste that file into the Supabase SQL editor
+(Vercel - Storage - supabase-chestnut-arrow - Open in Supabase - SQL
+Editor) before anyone uses the site. It is safe to run twice.
+
+See DOCUMENTATION.md for the full system reference: where each account
+lives, how a job flows, the fee split, and how to switch payments on.
+
 ## Open items
 
-1. **Escrow is promised but does not exist.** The terms, privacy and
+1. **Payments are built but not connected.** The Stripe layer exists
+   (checkout, webhook, release, Connect onboarding) and is inert until
+   `STRIPE_SECRET_KEY` is set, with the pay button stating plainly that
+   card payments are not live. It has never been tested against Stripe.
+   The terms, privacy and support pages still describe escrow, KYC and
+   24-hour payouts as though live - true only once keys are in.
+
+   Original note: **Escrow is promised but does not exist.** The terms, privacy and
    support pages, the footer and both detail pages describe escrow, KYC
    and 24-hour payouts. There is no `stripe` package, no checkout route
    and the payment button does nothing. Signup and AI pricing both work
@@ -60,7 +79,8 @@ Each of these was tested against production, not assumed.
    suspended around 19 Nov and was restored on the 21st. The clock
    restarted, so the next deadline is roughly **28 November**. Prolonged
    suspension is what destroyed the May 2026 database. Pro is $25/mo.
-3. **`info@cleanersmarketplace.co.uk` is unconfirmed.** MX records point
+3. **`info@cleanersmarketplace.co.uk` works** - confirmed receiving on
+   22 Nov 2026 via GoDaddy Professional Email. Original note: MX records point
    at GoDaddy Professional Email (`smtp.secureserver.net`,
    `mailstore1.secureserver.net`) and a test email was sent, but nobody
    has confirmed it arrived. If it did not, the mailbox is Microsoft 365
