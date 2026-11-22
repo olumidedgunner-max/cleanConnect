@@ -1,4 +1,6 @@
 "use client";
+
+import PayButton from "@/components/PayButton";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
@@ -169,10 +171,15 @@ export default function JobDetailPage() {
           <div>
             <div style={{ fontWeight: 800, marginBottom: "6px" }}>Escrow Protection</div>
             <p style={{ color: "#9fb0c1", fontSize: "14px", lineHeight: 1.7 }}>
-              Once you accept, the client funds escrow via Stripe. The full address is then revealed to you.
-              Upload before & after photos to release payment. Funds transfer to you after client approval.
+              Once you accept, the client pays and the money is held — not sent to you yet. The full
+              address is revealed when it is. Upload before &amp; after photos; funds transfer to you
+              once the client approves the finished job.
             </p>
           </div>
+        </div>
+
+        <div style={{ marginBottom: "28px" }}>
+          <PayButton jobId={id} amount={Number(total)} />
         </div>
 
         {/* Accept flow */}
